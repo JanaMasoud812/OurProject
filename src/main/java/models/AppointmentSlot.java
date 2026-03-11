@@ -1,0 +1,24 @@
+package models;
+
+import java.util.List;
+
+public  abstract class AppointmentSlot {
+	
+	private String time;
+	private boolean isAvailable;
+	
+	public AppointmentSlot(String time , boolean isAvailable) {
+		this.time=time;
+		this.isAvailable= isAvailable;
+	}
+	
+	
+	public abstract boolean getAvailable();
+	public abstract void setAvailable(boolean isAvailable) ;
+	public abstract void  setTime(String time) ;
+	public abstract String getTime();
+	public abstract List<AppointmentSlot> viewAvailableSlots(List<AppointmentSlot> slots);	
+	public abstract void bookSlot();
+	public abstract void cancelSlot();
+
+}
