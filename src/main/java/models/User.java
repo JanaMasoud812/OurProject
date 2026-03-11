@@ -1,4 +1,4 @@
-package pkg1;
+package models;
 
 public class User {
 	
