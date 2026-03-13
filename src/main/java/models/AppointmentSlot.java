@@ -4,8 +4,8 @@ import java.util.List;
 
 public  abstract class AppointmentSlot {
 	
-	private String time;
-	private boolean isAvailable;
+	protected String time;
+	protected boolean isAvailable;
 	
 	public AppointmentSlot(String time , boolean isAvailable) {
 		this.time=time;
