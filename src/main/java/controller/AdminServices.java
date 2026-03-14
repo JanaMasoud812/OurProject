@@ -15,7 +15,7 @@ public class AdminServices extends Admin {
 	@Override
 	public String login(String username, String password) {
 	
-	List<String> admins = fileservice.readFile("admins.txt");
+	List<String> admins = fileservice.readFile("src/main/resources/admins.txt");
 	 for (String line : admins) {
 		  String[] parts = line.split(",");
 		  if (parts[0].equals(username) && parts[1].equals(password)) {
@@ -39,7 +39,7 @@ public class AdminServices extends Admin {
 	
 	@Override
 	public void viewSlots() {
-		List<String> slots = fileservice.readFile("appointments.txt");
+		List<String> slots = fileservice.readFile("src/main/resources/appointments.txt");
 		for (String slot : slots) {
 			System.out.println(slot);
 		}
@@ -49,14 +49,14 @@ public class AdminServices extends Admin {
 	
 	@Override
 	public void addSlots(String time) {
-		fileservice.appendFile("appointments.txt", time+ ",Available");
+		fileservice.appendFile("src/main/resources/appointments.txt", time+ ",Available");
 		
 	}
 	
 	@Override
 	public void removeSlots(String time) {
 		
-		List<String> slots = fileservice.readFile("appointments.txt");
+		List<String> slots = fileservice.readFile("src/main/resources/appointments.txt");
 		List<String> updated = new ArrayList<>();
 		
 		for (String slot : slots) {
@@ -66,14 +66,14 @@ public class AdminServices extends Admin {
 			}
 		}
 		
-	fileservice.writeFile("appointments.txt", updated);
+	fileservice.writeFile("src/main/resources/appointments.txt", updated);
 		
 	}
 	
 	
 	@Override
 	public void modifySlots(String time, String status) {
-		  List<String> slots = fileservice.readFile("appointments.txt");
+		  List<String> slots = fileservice.readFile("src/main/resources/appointments.txt");
 	        List<String> updated = new ArrayList<>();
 
 	        for (String slot : slots) {
@@ -87,7 +87,7 @@ public class AdminServices extends Admin {
 	            }
 	        }
 
-	        fileservice.writeFile("appointments.txt", updated);
+	        fileservice.writeFile("src/main/resources/appointments.txt", updated);
 	    }
 		
 		
@@ -97,7 +97,7 @@ public class AdminServices extends Admin {
 	public void setUsername(String username) {
 		
 
-		    List<String> admins = fileservice.readFile("admins.txt");
+		    List<String> admins = fileservice.readFile("src/main/resources/admins.txt");
 		    List<String> updated = new ArrayList<>();
 
 		    for (String line : admins) {
@@ -110,7 +110,7 @@ public class AdminServices extends Admin {
 		        }
 		    }
 
-		    fileservice.writeFile("admins.txt", updated);
+		    fileservice.writeFile("src/main/resources/admins.txt", updated);
 		    super.username = username;
 		
 	}
@@ -119,7 +119,7 @@ public class AdminServices extends Admin {
 	@Override
 	public void setPassword(String password) {
 
-	    List<String> admins = fileservice.readFile("admins.txt");
+	    List<String> admins = fileservice.readFile("src/main/resources/admins.txt");
 	    List<String> updated = new ArrayList<>();
 
 	    for (String line : admins) {
@@ -136,7 +136,7 @@ public class AdminServices extends Admin {
 	        }
 	    }
 
-	    fileservice.writeFile("admins.txt", updated);
+	    fileservice.writeFile("src/main/resources/admins.txt", updated);
 
 	    super.password = password;
 	}
