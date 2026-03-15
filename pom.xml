@@ -4,4 +4,56 @@
   <artifactId>SchedulingSystem</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>AppointmentsSystem</name>
+  
+  
+   <dependencies>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.10.2</version>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+    
+  <build>
+    <plugins>
+        <!-- Jacoco plugin -->
+        <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>0.8.13</version>
+            <executions>
+                <execution>
+                    <goals>
+                        <goal>prepare-agent</goal>
+                    </goals>
+                </execution>
+                <execution>
+                    <id>report</id>
+                    <phase>test</phase>
+                    <goals>
+                        <goal>report</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+
+        <!-- Surefire plugin لإدارة الاختبارات -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>3.2.5</version>
+            <configuration>
+                <redirectTestOutputToFile>false</redirectTestOutputToFile>
+                <printSummary>true</printSummary>
+                <useFile>false</useFile>
+                <forkCount>0</forkCount>
+                <encoding>UTF-8</encoding>
+            </configuration>
+        </plugin>
+    </plugins>
+</build>
+  
 </project>

@@ -2,12 +2,10 @@ package controller;
 import models.AppointmentSlot;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class AppointmentSlotService extends AppointmentSlot{
 
@@ -89,3 +87,16 @@ public class AppointmentSlotService extends AppointmentSlot{
 	
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
