@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 10:00,true
 10:30,false
 11:00,false
@@ -5,3 +6,12 @@
 12:00,true
 12:30,false
 13:00,true
+=======
+10:00,Available
+10:30,Unavailable
+11:00,Available
+11:30,Available
+12:00,Unavailable
+12:30,Available
+13:00,Available
+>>>>>>> branch 'master' of https://github.com/JanaMasoud812/OurProject.git
