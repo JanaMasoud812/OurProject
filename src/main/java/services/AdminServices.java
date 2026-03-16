@@ -1,11 +1,11 @@
-package controller;
+package services;
 import models.Admin;
 import java.util.*;
 
 
 public class AdminServices extends Admin {
 	private boolean loggedIn = false;
-	private FileService fileservice = new FileService();
+	private FileServices fileservice = new FileServices();
 	
 	public AdminServices (String username, String password) {
 		super(username, password);

@@ -1,4 +1,4 @@
-package service;
+package services;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -9,8 +9,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import controller.AppointmentSlotService;
 import models.AppointmentSlot;
+import services.AppointmentSlotServices;
 
 public class AppointmentSlotServiceTest {
 	
