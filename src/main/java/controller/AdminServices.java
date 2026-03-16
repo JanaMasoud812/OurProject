@@ -55,19 +55,21 @@ public class AdminServices extends Admin {
 	
 	@Override
 	public void removeSlots(String time) {
-		
-		List<String> slots = fileservice.readFile("src/main/resources/appointments.txt");
-		List<String> updated = new ArrayList<>();
-		
-		for (String slot : slots) {
-			
-			if (!slot.startsWith(time)) {
-				updated.add(slot);
-			}
-		}
-		
-	fileservice.writeFile("src/main/resources/appointments.txt", updated);
-		
+
+	    List<String> slots = fileservice.readFile("src/main/resources/appointments.txt");
+
+	    List<String> updated = new ArrayList<>();
+
+	    for (String slot : slots) {
+
+	        String[] parts = slot.split(",");
+
+	        if (!parts[0].equals(time)) {
+	            updated.add(slot);
+	        }
+	    }
+
+	    fileservice.writeFile("src/main/resources/appointments.txt", updated);
 	}
 	
 	
@@ -154,6 +156,8 @@ public String getPassword() {
 }
 	
 	
-	
+	public boolean isLoggedIn() {
+		return loggedIn;
+	}
 	
 }

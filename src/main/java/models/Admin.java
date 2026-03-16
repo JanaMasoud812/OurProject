@@ -22,7 +22,7 @@ public abstract class Admin {
 	public abstract String getUsername();
 	public abstract void setPassword(String password);
 	public abstract String getPassword();
-	
+	public abstract boolean isLoggedIn();
 	
 
 }
