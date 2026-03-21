@@ -39,59 +39,41 @@ public class AppointmentSlotServices extends AppointmentSlot{
 		 List<AppointmentSlot> availableSlots = new ArrayList<>();
 
 		    try {
+		        // قراءة الملف من resources
+		        InputStream inputStream = getClass().getClassLoader()
+		                .getResourceAsStream("appointments.txt"); 
 
-		        InputStream inputStream =
-		                getClass().getClassLoader().getResourceAsStream("appointments.txt");
-
-		        BufferedReader reader =
-		                new BufferedReader(new InputStreamReader(inputStream));
-
+		        
+		        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 		        String line;
 
 		        while ((line = reader.readLine()) != null) {
-
 		            String[] parts = line.split(",");
 
-		            String time = parts[0];
-		            boolean available = Boolean.parseBoolean(parts[1]);
+		            if (parts.length < 2) continue;  
+
+		            String time = parts[0].trim();
+		            boolean available = parts[1].trim().equalsIgnoreCase("Available");
 
 		            if (available) {
-
 		                availableSlots.add(new AppointmentSlotServices(time, available));
-
 		            }
-
 		        }
 
 		        reader.close();
 
 		    } catch (Exception e) {
-
-		        System.out.println("Error reading appointments file");
-
+		        System.out.println("Error reading appointments file: " + e.getMessage());
 		    }
 
 		    return availableSlots;
 	}
 
-	@Override
-	public void bookSlot() {
-		
-	}
-
-	@Override
-	public void cancelSlot() {
-		
-	}
+	
 	
 	
 
 }
-
-
-
-
-
 
 
 

@@ -18,7 +18,6 @@ public  abstract class AppointmentSlot {
 	public abstract void  setTime(String time) ;
 	public abstract String getTime();
 	public abstract List<AppointmentSlot> viewAvailableSlots(List<AppointmentSlot> slots);	
-	public abstract void bookSlot();
-	public abstract void cancelSlot();
+	
 
 }

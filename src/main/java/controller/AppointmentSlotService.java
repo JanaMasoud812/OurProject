@@ -74,15 +74,7 @@ public class AppointmentSlotService extends AppointmentSlot{
 		    return availableSlots;
 	}
 
-	@Override
-	public void bookSlot() {
-		
-	}
-
-	@Override
-	public void cancelSlot() {
-		
-	}
+	
 	
 	
 
