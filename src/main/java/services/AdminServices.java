@@ -1,163 +1,189 @@
+
 package services;
 import models.Admin;
 import java.util.*;
 
-
 public class AdminServices extends Admin {
-	private boolean loggedIn = false;
-	private FileServices fileservice = new FileServices();
-	
-	public AdminServices (String username, String password) {
-		super(username, password);
-	}
+    private boolean loggedIn = false;
+    private FileServices fileservice = new FileServices();
+    
+    public AdminServices (String username, String password, String email, int id) {
+        super(username, password, email, id);
+    }
 
-	
-	@Override
-	public String login(String username, String password) {
-	
-	List<String> admins = fileservice.readFile("src/main/resources/admins.txt");
-	 for (String line : admins) {
-		  String[] parts = line.split(",");
-		  if (parts[0].equals(username) && parts[1].equals(password)) {
-			  loggedIn = true;
-			  return "Success";	  
-		  }
-		 
-		 
-	 }
-	 
-	 return "Failed";
-	}
-	
-	@Override
-	public void logout() {
-		
-		loggedIn = false;
-		
-	}
-	
-	
-	@Override
-	public void viewSlots() {
-		List<String> slots = fileservice.readFile("src/main/resources/appointments.txt");
-		for (String slot : slots) {
-			System.out.println(slot);
-		}
-		
-	}
-	
-	
-	@Override
-	public void addSlots(String time) {
-		fileservice.appendFile("src/main/resources/appointments.txt", time+ ",Available");
-		
-	}
-	
-	@Override
-	public void removeSlots(String time) {
+    @Override
+    public String login(String username, String password) {
+    
+        List<String> admins = fileservice.readFile("src/main/resources/admins.txt");
+        for (String line : admins) {
+            String[] parts = line.split(",");
+            if (parts[0].equals(username) && parts[1].equals(password)) {
+                loggedIn = true;
+                this.email = parts[2];
+                this.id = Integer.parseInt(parts[3]);
 
-	    List<String> slots = fileservice.readFile("src/main/resources/appointments.txt");
+                return "Success";      
+            }
+        }
+        return "Failed";
+    }
+    
+    @Override
+    public void logout() {
+        loggedIn = false;
+    }
+    
+    @Override
+    public void viewSlots() {
+        List<String> slots = fileservice.readFile("src/main/resources/appointments.txt");
+        for (String slot : slots) {
+            System.out.println(slot);
+        }
+    }
+    
+    @Override
+    public void addSlots(String time) {
+        fileservice.appendFile("src/main/resources/appointments.txt", time+ ",Available");
+    }
+    
+    @Override
+    public void removeSlots(String time) {
 
-	    List<String> updated = new ArrayList<>();
+        List<String> slots = fileservice.readFile("src/main/resources/appointments.txt");
+        List<String> updated = new ArrayList<>();
 
-	    for (String slot : slots) {
+        for (String slot : slots) {
+            String[] parts = slot.split(",");
+            if (!parts[0].equals(time)) {
+                updated.add(slot);
+            }
+        }
 
-	        String[] parts = slot.split(",");
+        fileservice.writeFile("src/main/resources/appointments.txt", updated);
+    }
+    
+    @Override
+    public void modifySlots(String time, String status) {
+        List<String> slots = fileservice.readFile("src/main/resources/appointments.txt");
+        List<String> updated = new ArrayList<>();
 
-	        if (!parts[0].equals(time)) {
-	            updated.add(slot);
-	        }
-	    }
+        for (String slot : slots) {
+            String[] parts = slot.split(",");
+            if (parts[0].equals(time)) {
+                updated.add(time + "," + status);
+            } else {
+                updated.add(slot);
+            }
+        }
 
-	    fileservice.writeFile("src/main/resources/appointments.txt", updated);
-	}
-	
-	
-	@Override
-	public void modifySlots(String time, String status) {
-		  List<String> slots = fileservice.readFile("src/main/resources/appointments.txt");
-	        List<String> updated = new ArrayList<>();
+        fileservice.writeFile("src/main/resources/appointments.txt", updated);
+    }
+    
+    @Override
+    public void setUsername(String username) {
 
-	        for (String slot : slots) {
+        List<String> admins = fileservice.readFile("src/main/resources/admins.txt");
+        List<String> updated = new ArrayList<>();
 
-	            String[] parts = slot.split(",");
+        for (String line : admins) {
+            String[] parts = line.split(",");
 
-	            if (parts[0].equals(time)) {
-	                updated.add(time + "," + status);
-	            } else {
-	                updated.add(slot);
-	            }
-	        }
+            if (parts[0].equals(super.username)) {
+                // 🔥 نحافظ على email و id
+                updated.add(username + "," + parts[1] + "," + parts[2] + "," + parts[3]);
+            } else {
+                updated.add(line);
+            }
+        }
 
-	        fileservice.writeFile("src/main/resources/appointments.txt", updated);
-	    }
-		
-		
-		
-	
-	@Override
-	public void setUsername(String username) {
-		
+        fileservice.writeFile("src/main/resources/admins.txt", updated);
+        super.username = username;
+    }
+    
+    @Override
+    public void setPassword(String password) {
 
-		    List<String> admins = fileservice.readFile("src/main/resources/admins.txt");
-		    List<String> updated = new ArrayList<>();
+        List<String> admins = fileservice.readFile("src/main/resources/admins.txt");
+        List<String> updated = new ArrayList<>();
 
-		    for (String line : admins) {
-		        String[] parts = line.split(",");
+        for (String line : admins) {
+            String[] parts = line.split(",");
 
-		        if (parts[0].equals(super.username)) {
-		            updated.add(username + "," + parts[1]);
-		        } else {
-		            updated.add(line);
-		        }
-		    }
+            if (parts[0].equals(super.username)) {
+                updated.add(parts[0] + "," + password + "," + parts[2] + "," + parts[3]);
+            } else {
+                updated.add(line);
+            }
+        }
 
-		    fileservice.writeFile("src/main/resources/admins.txt", updated);
-		    super.username = username;
-		
-	}
-	
-	
-	@Override
-	public void setPassword(String password) {
+        fileservice.writeFile("src/main/resources/admins.txt", updated);
+        super.password = password;
+    }
+    
+    @Override
+    public String getUsername() {
+        return super.username;
+    }
+    
+    @Override
+    public String getPassword() {
+        return super.password;
+    }
+    
+    @Override
+    public boolean isLoggedIn() {
+        return loggedIn;
+    }
 
-	    List<String> admins = fileservice.readFile("src/main/resources/admins.txt");
-	    List<String> updated = new ArrayList<>();
 
-	    for (String line : admins) {
+    @Override
+    public void setEmail(String email) {
 
-	        String[] parts = line.split(",");
+        List<String> admins = fileservice.readFile("src/main/resources/admins.txt");
+        List<String> updated = new ArrayList<>();
 
-	        if (parts[0].equals(super.username)) {
+        for (String line : admins) {
+            String[] parts = line.split(",");
 
-	            updated.add(parts[0] + "," + password);
+            if (parts[0].equals(super.username)) {
+                updated.add(parts[0] + "," + parts[1] + "," + email + "," + parts[3]);
+            } else {
+                updated.add(line);
+            }
+        }
 
-	        } else {
+        fileservice.writeFile("src/main/resources/admins.txt", updated);
+        super.email = email;
+    }
 
-	            updated.add(line);
-	        }
-	    }
+    @Override
+    public String getEmail() {
+        return super.email;
+    }
 
-	    fileservice.writeFile("src/main/resources/admins.txt", updated);
+    @Override
+    public void setId(int id) {
 
-	    super.password = password;
-	}
-	
-	@Override
-	public String getUsername() {
-		return super.username;
-		
-	}
-	
-@Override
-public String getPassword() {
-	return super.password;
-	
+        List<String> admins = fileservice.readFile("src/main/resources/admins.txt");
+        List<String> updated = new ArrayList<>();
+
+        for (String line : admins) {
+            String[] parts = line.split(",");
+
+            if (parts[0].equals(super.username)) {
+                updated.add(parts[0] + "," + parts[1] + "," + parts[2] + "," + id);
+            } else {
+                updated.add(line);
+            }
+        }
+
+        fileservice.writeFile("src/main/resources/admins.txt", updated);
+        super.id = id;
+    }
+
+    @Override
+    public int getId() {
+        return super.id;
+    }
 }
-	
-	
-	public boolean isLoggedIn() {
-		return loggedIn;
-	}
-	
-}
+

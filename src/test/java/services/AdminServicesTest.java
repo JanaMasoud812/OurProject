@@ -46,7 +46,7 @@ class AdminServicesTest {
 
 	@Test
 	void testLoginSuccess() {
-	    AdminServices admin = new AdminServices("admin", "1234");
+	    AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
 	    String result = admin.login("admin", "1234");
 	    assertEquals("Success", result); 
 	    assertTrue(admin.isLoggedIn()); 
@@ -58,7 +58,7 @@ class AdminServicesTest {
 	
 	@Test
 	void testLoginWrongPassword() {
-	    AdminServices admin = new AdminServices("admin", "1234");
+	    AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
 	    String result = admin.login("admin", "0000");
 	    assertEquals("Failed", result);
 	    assertFalse(admin.isLoggedIn()); 
@@ -67,7 +67,7 @@ class AdminServicesTest {
 	
 	@Test
 	void testLoginUserNotFound() {
-	    AdminServices admin = new AdminServices("admin", "1234");
+	    AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
 	    String result = admin.login("unknown", "1234");
 	    assertEquals("Failed", result); 
 	    assertFalse(admin.isLoggedIn());
@@ -76,7 +76,7 @@ class AdminServicesTest {
 	
 	@Test
 	void testLoginInvalidData() {
-	    AdminServices admin = new AdminServices("admin", "1234");
+	    AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
 	    String result = admin.login("abc", "0000");
 	    assertEquals("Failed", result); 
 	    assertFalse(admin.isLoggedIn());
@@ -85,7 +85,7 @@ class AdminServicesTest {
 	//username
 	@Test
 	void testSetUsername() {
-	    AdminServices admin = new AdminServices("admin", "1234");
+	    AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
 	    String original = admin.getUsername();
 
 	    admin.setUsername("newAdmin"); 
@@ -96,7 +96,7 @@ class AdminServicesTest {
 	
 	@Test
 	void testGetUsername() {
-	    AdminServices admin = new AdminServices("admin", "1234");
+	    AdminServices admin =new AdminServices("admin", "1234", "admin@email.com", 6);
 	    assertEquals("admin", admin.getUsername());
 	}
 	
@@ -105,7 +105,7 @@ class AdminServicesTest {
 	//password
 	@Test
 	void testSetPassword() {
-	    AdminServices admin = new AdminServices("admin", "1234");
+	    AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
 	    String original = admin.getPassword();
 
 	    admin.setPassword("9999");
@@ -116,14 +116,14 @@ class AdminServicesTest {
 	
 	@Test
 	void testGetPassword() {
-	    AdminServices admin = new AdminServices("admin", "1234");
+	    AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
 	    assertEquals("1234", admin.getPassword());
 	}
 	
 	
 	@Test
 	void testLogout() {
-	    AdminServices admin = new AdminServices("admin", "1234");
+	    AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
 	    admin.login("admin", "1234");
 	    assertTrue(admin.isLoggedIn());
 
@@ -134,7 +134,7 @@ class AdminServicesTest {
 	
 	@Test
 	void testAddSlot() {
-	    AdminServices admin = new AdminServices("admin", "1234");
+	    AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
 	    String time = "18:00";
 
 	    admin.removeSlots(time);   
@@ -152,7 +152,7 @@ class AdminServicesTest {
 	
 	@Test
 	void testRemoveSlot() {
-	    AdminServices admin = new AdminServices("admin", "1234");
+	    AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
 	    String time = "19:00";
 
 	    admin.addSlots(time);
@@ -169,7 +169,7 @@ class AdminServicesTest {
 	
 	@Test
 	void testModifySlot() {
-	    AdminServices admin = new AdminServices("admin", "1234");
+	    AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
 	    String time = "20:00";
 
 	    admin.addSlots(time);
@@ -188,7 +188,7 @@ class AdminServicesTest {
 	
 	@Test
 	void testViewSlots() {
-	    AdminServices admin = new AdminServices("admin", "1234");
+	    AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
 
 	    String time = "21:00";
 	    admin.addSlots(time);
@@ -199,9 +199,57 @@ class AdminServicesTest {
 	}
 	
 	
+	@Test
+	void testSetEmail() {
+	    AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
+
+	    admin.setEmail("new@email.com");
+	    assertEquals("new@email.com", admin.getEmail());
+
+	    admin.setEmail("admin@email.com");
+	}
+	
+	@Test
+	void testGetEmail() {
+	    AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
+	    assertEquals("admin@email.com", admin.getEmail());
+	}
+	
+	
+	@Test
+	void testSetId() {
+	    AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
+
+	    admin.setId(99);
+	    assertEquals(99, admin.getId());
+
+	    admin.setId(6);
+	}
+	
+	
+	@Test
+	void testGetId() {
+	    AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
+	    assertEquals(6, admin.getId());
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	
 	
 
 }
+

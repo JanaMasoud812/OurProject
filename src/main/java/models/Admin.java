@@ -4,11 +4,15 @@ public abstract class Admin {
 	
 	protected String username;
 	protected String password;
+	protected String email;
+	protected int id;
 	
-	public Admin (String username, String password) {
+	public Admin (String username, String password, String email, int id) {
 		
 		this.username = username;
 		this.password = password;
+		this.email = email;
+		this.id = id;
 	}
 	
 	
@@ -23,6 +27,9 @@ public abstract class Admin {
 	public abstract void setPassword(String password);
 	public abstract String getPassword();
 	public abstract boolean isLoggedIn();
-	
+	public abstract void setEmail(String email);
+	public abstract String getEmail();
+    public abstract void setId(int id);
+    public abstract int getId();
 
 }
