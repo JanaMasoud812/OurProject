@@ -43,7 +43,7 @@ public class AdminServices extends Admin {
     
     @Override
     public void addSlots(String time) {
-        fileservice.appendFile("src/main/resources/appointments.txt", time+ ",Available");
+        fileservice.appendFile("src/main/resources/appointments.txt", time+ ",Available,30,0,5");
     }
     
     @Override
@@ -68,9 +68,21 @@ public class AdminServices extends Admin {
         List<String> updated = new ArrayList<>();
 
         for (String slot : slots) {
+        	
+        	if(slot.startsWith("Time")) {
+        		updated.add(slot);
+                continue;
+        			}
+        	
             String[] parts = slot.split(",");
+            
+            String slotTime = parts[0];
+            String duration = parts[2];
+            String current = parts[3];
+            String max = parts[4]; 
+            
             if (parts[0].equals(time)) {
-                updated.add(time + "," + status);
+                updated.add(slotTime + "," + status + "," + duration + "," + current + "," + max);
             } else {
                 updated.add(slot);
             }

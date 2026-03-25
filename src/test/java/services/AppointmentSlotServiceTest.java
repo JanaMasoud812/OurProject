@@ -30,7 +30,10 @@ public class AppointmentSlotServiceTest {
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         List<String> availableFromFile = reader.lines()
-                                               .filter(line -> line.trim().endsWith("Available"))
+        		.filter(line -> {
+        		    String[] parts = line.split(",");
+        		    return parts.length > 1 && parts[1].trim().equalsIgnoreCase("Available");
+        		})
                                                .collect(Collectors.toList());
 
         reader.close();

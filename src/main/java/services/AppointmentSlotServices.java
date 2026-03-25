@@ -42,12 +42,19 @@ public class AppointmentSlotServices extends AppointmentSlot{
 		        // قراءة الملف من resources
 		        InputStream inputStream = getClass().getClassLoader()
 		                .getResourceAsStream("appointments.txt"); 
+		        
+		        if (inputStream == null) {
+		            System.out.println("appointments.txt not found");
+		            return availableSlots;
+		        }
 
 		        
 		        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 		        String line;
 
 		        while ((line = reader.readLine()) != null) {
+		        	 if(line.startsWith("Time")) continue;
+		        	 
 		            String[] parts = line.split(",");
 
 		            if (parts.length < 2) continue;  
@@ -56,7 +63,8 @@ public class AppointmentSlotServices extends AppointmentSlot{
 		            boolean available = parts[1].trim().equalsIgnoreCase("Available");
 
 		            if (available) {
-		                availableSlots.add(new AppointmentSlotServices(time, available));
+		                availableSlots.add(new AppointmentSlotServices(time,true ));
+		                
 		            }
 		        }
 

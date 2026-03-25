@@ -144,7 +144,7 @@ class AdminServicesTest {
 	    FileServices file = new FileServices();
 	    List<String> slots = file.readFile("src/main/resources/appointments.txt");
 
-	    boolean found = slots.stream().anyMatch(s -> s.equals(time + ",Available"));
+	    boolean found = slots.stream().anyMatch(s -> s.equals(time + ",Available,30,0,5"));
 	    assertTrue(found);
 
 	    admin.removeSlots(time); 
@@ -159,11 +159,11 @@ class AdminServicesTest {
 
 	    FileServices file = new FileServices();
 	    List<String> slotsBefore = file.readFile("src/main/resources/appointments.txt");
-	    assertTrue(slotsBefore.contains(time + ",Available"));
+	    assertTrue(slotsBefore.contains(time + ",Available,30,0,5"));
 
 	    admin.removeSlots(time);
 	    List<String> slotsAfter = file.readFile("src/main/resources/appointments.txt");
-	    assertFalse(slotsAfter.contains(time + ",Available"));
+	    assertFalse(slotsAfter.contains(time + ",Available,30,0,5"));
 	}
 	
 	
@@ -174,12 +174,12 @@ class AdminServicesTest {
 
 	    admin.addSlots(time);
 
-	    admin.modifySlots(time, "Booked");
+	    admin.modifySlots(time, "Unavailable");
 
 	    FileServices file = new FileServices();
 	    List<String> slots = file.readFile("src/main/resources/appointments.txt");
-	    assertTrue(slots.contains(time + ",Booked"));
-	    assertFalse(slots.contains(time + ",Available"));
+	    assertTrue(slots.stream().anyMatch(s -> s.startsWith(time + ",Unavailable")));
+	    assertFalse(slots.stream().anyMatch(s -> s.startsWith(time + ",Available")));
 
 	    admin.removeSlots(time);
 	}
