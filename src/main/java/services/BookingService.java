@@ -11,6 +11,13 @@ public class BookingService {
 	private final int MAX_PARTICIPANTS = 5;
 	private final int MAX_DURATION = 60;
 	
+    private final NotificationService notificationService;
+    
+    public BookingService(NotificationService notificationService) {
+    	this.notificationService= notificationService;
+    }
+	
+	
 	
 	public String bookAppointment(Booking booking) {
 		
@@ -62,6 +69,12 @@ public class BookingService {
 
         booking.confirmBooking();
         booked = true;
+        
+        notificationService.sendNotification(
+                booking.getUsername(),
+                "Your appointment at " + booking.getTime() + " is confirmed"
+        );
+        
 
     } else {
         updated.add(slot);
