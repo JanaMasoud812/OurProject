@@ -27,7 +27,7 @@ class BookingServiceTest {
 
 	 @BeforeEach
 	    void setUp() throws IOException {
-	        service = new BookingService();
+		    service = new BookingService(new MockNotificationService());
 	        // backup files content
 	        appointmentsBackup = Files.readString(appointmentsPath);
 	        bookingsBackup = Files.readString(bookingsPath);
