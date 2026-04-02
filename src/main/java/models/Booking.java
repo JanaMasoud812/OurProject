@@ -42,7 +42,7 @@ public class Booking {
 	{
 		this.username= username;
 		this.time = time;
-		this.status= "Confirmed";
+		this.status= status;
 		this.duration=  duration;
 		this.participants=participants;
 		

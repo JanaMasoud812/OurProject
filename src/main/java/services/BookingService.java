@@ -1,32 +1,44 @@
 package services;
-import models.Booking; //this
+import models.*; //this
 import java.util.*;  // and this
 
 
 public class BookingService {
 	//from this
-
 	private FileServices fileService = new FileServices();
-//	private AppointmentSlotServices slotService = new AppointmentSlotServices("", true);
-	private final int MAX_PARTICIPANTS = 5;
-	private final int MAX_DURATION = 60;
-	
+    private final List<BookingRuleStrategy> rules;
     private final NotificationService notificationService;
-    
+    private final List<AppointmentObserver> observers = new ArrayList<>();
     public BookingService(NotificationService notificationService) {
-    	this.notificationService= notificationService;
+        this.notificationService = notificationService;
+        this.rules = new ArrayList<>();
+        this.rules.add(new MaxParticipantsRule(5));
+        this.rules.add(new MaxDurationRule(60));
+        this.addObserver(new NotificationObserver(notificationService));
     }
+    
 	
-	
+    public void addObserver(AppointmentObserver observer) {
+        observers.add(observer);
+    }
+
+    private void notifyConfirmed(Booking booking) {
+        for (AppointmentObserver o : observers) {
+            o.onBookingConfirmed(booking);
+        }
+    }
+
+    private void notifyCancelled(Booking booking) {
+        for (AppointmentObserver o : observers) {
+            o.onBookingCancelled(booking);
+        }
+    }
 	
 	public String bookAppointment(Booking booking) {
 		
-		if (booking.isFull(MAX_PARTICIPANTS)) {
-			return "Booking Failed: Max participants exceeded";
-		}
-		
-		if (booking.getDuration() > MAX_DURATION) {
-			return "Booking Failed: Duration Exceeded";
+		for (BookingRuleStrategy rule : rules) {
+		    String error = rule.validate(booking);
+		    if (error != null) return error;
 		}
 		
 		List<String> slots = fileService.readFile("src/main/resources/appointments.txt");
@@ -70,11 +82,7 @@ public class BookingService {
         booking.confirmBooking();
         booked = true;
         
-        notificationService.sendNotification(
-                booking.getUsername(),
-                "Your appointment at " + booking.getTime() + " is confirmed"
-        );
-        
+        notifyConfirmed(booking);
 
     } else {
         updated.add(slot);
@@ -102,6 +110,7 @@ public class BookingService {
 	
 	public void cancelBooking(Booking booking) {
 	    booking.cancelBooking();
+	    notifyCancelled(booking);
 
 	    List<String> slots = fileService.readFile("src/main/resources/appointments.txt");
 	    List<String> updated = new ArrayList<>();
