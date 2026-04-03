@@ -1,11 +1,14 @@
 
 package services;
-import models.Admin;
+
+import models.*;
 import java.util.*;
+import services.*;
 
 public class AdminServices extends Admin {
     private boolean loggedIn = false;
     private FileServices fileservice = new FileServices();
+    
     
     public AdminServices (String username, String password, String email, int id) {
         super(username, password, email, id);
@@ -197,5 +200,26 @@ public class AdminServices extends Admin {
     public int getId() {
         return super.id;
     }
+    
+    @Override
+    public void cancelUserBooking(Booking booking) {
+    	BookingService bookingService = new BookingService(new MockNotificationService());
+    	bookingService.cancelBooking(booking);
+    }
+    
+    @Override
+    public String modifyUserBooking(Booking booking, String newTime) {
+    	BookingService bookingService = new BookingService(new MockNotificationService());
+    	return bookingService.modifyBooking(booking, newTime);
+    	
+    }
+    
+    
+    
+    
+    
+    
+    
+    
 }
 

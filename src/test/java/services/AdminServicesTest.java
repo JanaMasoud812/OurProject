@@ -1,5 +1,6 @@
 package services;
-
+import java.nio.file.*;
+import models.Booking;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -26,13 +27,22 @@ class AdminServicesTest {
 
 	@BeforeEach
 	void setUp() throws Exception {
+		
+		appointmentsBackup = Files.readString(appointmentsPath);
+	    bookingsBackup = Files.readString(bookingsPath);
+		
 	}
 
 	@AfterEach
 	void tearDown() throws Exception {
+		Files.writeString(appointmentsPath, appointmentsBackup);
+	    Files.writeString(bookingsPath, bookingsBackup);
 	}
 
-
+	private Path appointmentsPath = Paths.get("src/main/resources/appointments.txt");
+	private Path bookingsPath = Paths.get("src/main/resources/booking.txt");
+	private String appointmentsBackup;
+	private String bookingsBackup;
 
 	//@Test
 	//void test() {
@@ -234,7 +244,28 @@ class AdminServicesTest {
 	}
 	
 	
-	
+	@Test
+	void testAdminCancelUserBooking() {
+	    BookingService bookingService = new BookingService(new MockNotificationService());
+	    Booking booking = new Booking("testUser", "12:30", "Pending", 30, 1);
+	    bookingService.bookAppointment(booking);
+
+	    AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
+	    admin.cancelUserBooking(booking);
+
+	    assertEquals("canceled", booking.getStatus());
+	}
+
+	@Test
+	void testAdminModifyUserBooking() {
+	    BookingService bookingService = new BookingService(new MockNotificationService());
+	    Booking booking = new Booking("testUser", "12:30", "Pending", 30, 1);
+	    bookingService.bookAppointment(booking);
+
+	    AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
+	    String result = admin.modifyUserBooking(booking, "13:00");
+	    assertEquals("Booking Success", result);
+	}
 	
 	
 	

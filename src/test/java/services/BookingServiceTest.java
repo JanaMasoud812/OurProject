@@ -91,4 +91,36 @@ class BookingServiceTest {
 	        boolean found = appointments.stream().anyMatch(line -> line.startsWith("10:00") && line.contains("Available"));
 	        assertTrue(found);
 	    }
+	    
+	    @Test
+	    void testModifyBooking() throws IOException{
+	    	
+	    	Booking booking = new Booking("testUser","12:30","Pending", 30, 1);
+	    	service.bookAppointment(booking);
+	    	
+	    	String result = service.modifyBooking(booking, "13:00");
+	    	assertEquals("Booking Success", result);
+	    	
+	    	
+	    }
+	    
+	    
+	    @Test
+	    void testModifyPastBooking() {
+	    	Booking booking = new Booking("testUser", "08:00", "Pending", 30, 1);
+	    	String result = service.modifyBooking(booking, "13:00");
+	    	assertTrue(result.contains("Cannot modify past appointments"));
+	    	
+	    	
+	    }
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
 }

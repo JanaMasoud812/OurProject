@@ -1,5 +1,7 @@
 package services;
 import models.*; //this
+
+import java.time.LocalTime;
 import java.util.*;  // and this
 
 
@@ -144,7 +146,72 @@ public class BookingService {
 	    }
 
 	    fileService.writeFile("src/main/resources/appointments.txt", updated);
+	    List<String> bookings = fileService.readFile("src/main/resources/booking.txt");
+	    List<String> updatedBookings = new ArrayList<>();
+	    for (String line : bookings) {
+	        if (!line.startsWith(booking.getUsername() + "," + booking.getTime())) {
+	            updatedBookings.add(line);
+	        }
+	    }
+	    fileService.writeFile("src/main/resources/booking.txt", updatedBookings);
 	}
+	
+	public String modifyBooking(Booking oldBooking, String newTime) {
+		//future check
+		LocalTime now = LocalTime.now();
+		LocalTime appointmentTime = LocalTime.parse(oldBooking.getTime());
+		
+		if(appointmentTime.isBefore(now)) {
+			return "Modify Failed: Cannot modify past appointments";
+		}
+		
+		
+		
+		
+		cancelBooking(oldBooking);
+		
+		Booking newBooking = new Booking(
+				
+				oldBooking.getUsername(),
+				newTime,
+				"Pending",
+				oldBooking.getDuration(),
+				oldBooking.getParticipants()	
+				);
+		
+		
+		
+		return bookAppointment(newBooking);
+			
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	
