@@ -1,5 +1,5 @@
 Time,Status,Duration,CurrentParticipants,MaxParticipants
-10:00,Unavailable,30,5,5
+10:00,Available,30,0,5
 10:30,Unavailable,30,0,5
 11:00,Unavailable,30,5,5
 11:30,Available,30,4,5

@@ -4,6 +4,7 @@ import models.Booking;
 import org.junit.jupiter.api.*;
 import java.io.*;
 import java.nio.file.*;
+import java.time.LocalTime;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -93,21 +94,18 @@ class BookingServiceTest {
 	    }
 	    
 	    @Test
-	    void testModifyBooking() throws IOException{
-	    	
-	    	Booking booking = new Booking("testUser","12:30","Pending", 30, 1);
-	    	service.bookAppointment(booking);
-	    	
-	    	String result = service.modifyBooking(booking, "13:00");
-	    	assertEquals("Booking Success", result);
-	    	
-	    	
+	    void testModifyBooking() throws IOException {
+	        Booking booking = new Booking("testUser", "12:30", "Pending", 30, 1);
+	        service.bookAppointment(booking);
+	        
+	        String result = service.modifyBooking(booking, "13:00", LocalTime.of(8, 0));
+	        assertEquals("Booking Success", result);
 	    }
 	    
 	    
 	    @Test
 	    void testModifyPastBooking() {
-	    	Booking booking = new Booking("testUser", "08:00", "Pending", 30, 1);
+	    	Booking booking = new Booking("testUser", "00:01", "Pending", 30, 1);
 	    	String result = service.modifyBooking(booking, "13:00");
 	    	assertTrue(result.contains("Cannot modify past appointments"));
 	    	

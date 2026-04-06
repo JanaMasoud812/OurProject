@@ -11,8 +11,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import services.*;
+import java.time.LocalTime;
+//import services.*;
 
 
 class AdminServicesTest {
@@ -159,42 +159,45 @@ class AdminServicesTest {
 
 	    admin.removeSlots(time); 
 	}
-	
+
 	@Test
 	void testRemoveSlot() {
 	    AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
 	    String time = "19:00";
 
+	    admin.removeSlots(time); 
 	    admin.addSlots(time);
 
 	    FileServices file = new FileServices();
 	    List<String> slotsBefore = file.readFile("src/main/resources/appointments.txt");
-	    assertTrue(slotsBefore.contains(time + ",Available,30,0,5"));
+	    assertTrue(slotsBefore.stream()
+	        .anyMatch(s -> s.trim().equals(time + ",Available,30,0,5")));
 
 	    admin.removeSlots(time);
 	    List<String> slotsAfter = file.readFile("src/main/resources/appointments.txt");
-	    assertFalse(slotsAfter.contains(time + ",Available,30,0,5"));
+	    assertFalse(slotsAfter.stream()
+	        .anyMatch(s -> s.trim().equals(time + ",Available,30,0,5")));
 	}
-	
 	
 	@Test
 	void testModifySlot() {
 	    AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
 	    String time = "20:00";
 
+	    admin.removeSlots(time);
 	    admin.addSlots(time);
 
 	    admin.modifySlots(time, "Unavailable");
 
 	    FileServices file = new FileServices();
 	    List<String> slots = file.readFile("src/main/resources/appointments.txt");
-	    assertTrue(slots.stream().anyMatch(s -> s.startsWith(time + ",Unavailable")));
-	    assertFalse(slots.stream().anyMatch(s -> s.startsWith(time + ",Available")));
+	    assertTrue(slots.stream()
+	        .anyMatch(s -> s.trim().startsWith(time + ",Unavailable")));
+	    assertFalse(slots.stream()
+	        .anyMatch(s -> s.trim().startsWith(time + ",Available")));
 
 	    admin.removeSlots(time);
 	}
-	
-	
 	
 	@Test
 	void testViewSlots() {
@@ -255,7 +258,7 @@ class AdminServicesTest {
 
 	    assertEquals("canceled", booking.getStatus());
 	}
-
+/*
 	@Test
 	void testAdminModifyUserBooking() {
 	    BookingService bookingService = new BookingService(new MockNotificationService());
@@ -267,11 +270,32 @@ class AdminServicesTest {
 	    assertEquals("Booking Success", result);
 	}
 	
+	*/
 	
 	
+	@Test
+	void testAdminModifyUserBooking() {
+	    BookingService bookingService = new BookingService(new MockNotificationService());
+	    Booking booking = new Booking("testUser", "12:30", "Pending", 30, 1);
+	    bookingService.bookAppointment(booking);
+
+	    String result = bookingService.modifyBooking(booking, "13:00", LocalTime.of(8, 0));
+	    assertEquals("Booking Success", result);
+	    assertTrue(LocalTime.parse("13:00").isAfter(LocalTime.of(8, 0)));
+	}
 	
 	
-	
+	@Test
+	void shouldRejectPastTime() {
+	    BookingService bookingService = new BookingService(new MockNotificationService());
+	    Booking booking = new Booking("testUser", "07:00", "Pending", 30, 1);
+
+	    bookingService.bookAppointment(booking);
+
+	    String result = bookingService.modifyBooking(booking, "13:00", LocalTime.of(8, 0));
+
+	    assertTrue(result.contains("Cannot modify past"));
+	}
 	
 	
 	

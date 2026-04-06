@@ -66,7 +66,7 @@ public class BookingService {
     if (time.equals(booking.getTime()) && status.equals("Available")) {
 
         if (booking.getDuration() > duration) {
-            return "Booking Failed: Duration exceeded";
+            return "Booking Failed: Duration Exceeded";
         }
 
         if (current + booking.getParticipants() > max) {
@@ -155,7 +155,7 @@ public class BookingService {
 	    }
 	    fileService.writeFile("src/main/resources/booking.txt", updatedBookings);
 	}
-	
+	/*
 	public String modifyBooking(Booking oldBooking, String newTime) {
 		//future check
 		LocalTime now = LocalTime.now();
@@ -185,10 +185,26 @@ public class BookingService {
 			
 	}
 	
+	*/
 	
-	
-	
-	
+	public String modifyBooking(Booking oldBooking, String newTime, LocalTime currentTime) {
+	    if(LocalTime.parse(oldBooking.getTime()).isBefore(currentTime)) {
+	        return "Modify Failed: Cannot modify past appointments";
+	    }
+	    cancelBooking(oldBooking);
+	    Booking newBooking = new Booking(
+	        oldBooking.getUsername(),
+	        newTime,
+	        "Pending",
+	        oldBooking.getDuration(),
+	        oldBooking.getParticipants()
+	    );
+	    return bookAppointment(newBooking);
+	}
+
+	public String modifyBooking(Booking oldBooking, String newTime) {
+	    return modifyBooking(oldBooking, newTime, LocalTime.now());
+	}
 	
 	
 	
