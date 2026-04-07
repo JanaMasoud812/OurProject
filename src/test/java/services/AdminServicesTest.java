@@ -5,6 +5,7 @@ import models.Booking;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
+import services.AdminServices;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -12,6 +13,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.time.LocalTime;
+import services.BookingService;
+import services.MockNotificationService;
+
+
 //import services.*;
 
 
@@ -258,6 +263,8 @@ class AdminServicesTest {
 
 	    assertEquals("canceled", booking.getStatus());
 	}
+	
+
 /*
 	@Test
 	void testAdminModifyUserBooking() {
@@ -272,17 +279,8 @@ class AdminServicesTest {
 	
 	*/
 	
+	 
 	
-	@Test
-	void testAdminModifyUserBooking() {
-	    BookingService bookingService = new BookingService(new MockNotificationService());
-	    Booking booking = new Booking("testUser", "12:30", "Pending", 30, 1);
-	    bookingService.bookAppointment(booking);
-
-	    String result = bookingService.modifyBooking(booking, "13:00", LocalTime.of(8, 0));
-	    assertEquals("Booking Success", result);
-	    assertTrue(LocalTime.parse("13:00").isAfter(LocalTime.of(8, 0)));
-	}
 	
 	
 	@Test
@@ -298,13 +296,73 @@ class AdminServicesTest {
 	}
 	
 	
+	///////////////////////////////////////////////////////////////////////////////////////////////////
 	
+	@Test
+	void testAdminModifyUserBooking() {
+	    AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
+	    Booking booking = new Booking("testUser", "11:30", "Pending", 30, 1);
+
+	    admin.getBookingService().bookAppointment(booking);
+
+	    String result = admin.modifyUserBooking(booking, "13:00");
+
+	    assertEquals("Booking Success", result);
+	}
+
+    @Test
+    void testAdminCancelBooking_Unauthorized() {
+        AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
+        Booking booking = new Booking("fawzia@gmail.com", "12:30", "Pending", 30, 1);
+
+        admin.getBookingService().bookAppointment(booking);
+
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            admin.adminCancelBooking(booking, 5);
+        });
+
+        assertEquals("Unauthorized: Only admins can cancel bookings.", exception.getMessage());
+    }
+
+    @Test
+    void testAdminModifyBooking_Success() {
+        AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
+        Booking booking = new Booking("fawzia@gmail.com", "11:30", "Pending", 30, 1);
+
+        admin.getBookingService().bookAppointment(booking);
+
+        String result = admin.adminModifyBooking(booking, "13:00", 6);
+
+        assertEquals("Booking Success", result);
+    }
+
+    @Test
+    void testAdminModifyBooking_Unauthorized() {
+        AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
+        Booking booking = new Booking("fawzia@gmail.com", "22:00", "Pending", 30, 1);
+
+        admin.getBookingService().bookAppointment(booking);
+
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            admin.adminModifyBooking(booking, "13:00", 5);
+        });
+
+        assertEquals("Unauthorized: Only admins can modify bookings.", exception.getMessage());
+    }
+
+    @Test
+    void testAdminCancelBooking_Success() {
+        AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
+        Booking booking = new Booking("fawzia@gmail.com", "12:30", "Pending", 30, 1);
+
+        admin.getBookingService().bookAppointment(booking);
+
+        admin.adminCancelBooking(booking, 6);
+
+        assertEquals("canceled", booking.getStatus());
+    }
 	
-	
-	
-	
-	
-	
+		
 
 }
 

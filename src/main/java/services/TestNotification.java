@@ -14,8 +14,8 @@ public class TestNotification {
         BookingService bookingService = new BookingService(emailService);
 // حجز جديد
         Booking booking = new Booking(
-                "fawziaorade@gmail.com",
-                "11:30",
+                "fawzia@gmail.com",
+                "12:30",
                 "Pending",
                 30,  
                 1
@@ -32,7 +32,7 @@ public class TestNotification {
             System.out.println("Cannot cancel: Booking was not successful.");
         }
         
-        bookingService.cancelBooking(booking);
-        System.out.println("Booking cancelled.");
+       // bookingService.cancelBooking(booking);
+       // System.out.println("Booking cancelled.");
     }
 }

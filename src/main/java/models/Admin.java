@@ -31,6 +31,6 @@ public abstract class Admin {
 	public abstract String getEmail();
     public abstract void setId(int id);
     public abstract int getId();
-    public abstract void cancelUserBooking(Booking booking);
-    public abstract String modifyUserBooking(Booking booking, String newTime);
+    public abstract void cancelUserBooking(Booking booking );
+    public abstract String modifyUserBooking(Booking booking, String newTime );
 }

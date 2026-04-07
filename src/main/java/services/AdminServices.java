@@ -2,17 +2,30 @@
 package services;
 
 import models.*;
+
+import java.time.LocalTime;
 import java.util.*;
 import services.*;
+
 
 public class AdminServices extends Admin {
     private boolean loggedIn = false;
     private FileServices fileservice = new FileServices();
+    private BookingService bookingService;
     
+   
     
     public AdminServices (String username, String password, String email, int id) {
         super(username, password, email, id);
+        this.bookingService = new BookingService(new MockNotificationService());
+        }
+    //////
+    public BookingService getBookingService() {
+        return  bookingService;
     }
+    
+    
+    
 
     @Override
     public String login(String username, String password) {
@@ -20,7 +33,7 @@ public class AdminServices extends Admin {
         List<String> admins = fileservice.readFile("src/main/resources/admins.txt");
         for (String line : admins) {
             String[] parts = line.split(",");
-            if (parts[0].equals(username) && parts[1].equals(password)) {
+            if (parts[0].equals(username) && parts[1].equals(password)) { 
                 loggedIn = true;
                 this.email = parts[2];
                 this.id = Integer.parseInt(parts[3]);
@@ -202,19 +215,30 @@ public class AdminServices extends Admin {
     
     @Override
     public void cancelUserBooking(Booking booking) {
-    	BookingService bookingService = new BookingService(new MockNotificationService());
     	bookingService.cancelBooking(booking);
     }
     
     
     @Override
     public String modifyUserBooking(Booking booking, String newTime) {
-    	BookingService bookingService = new BookingService(new MockNotificationService());
-    	return bookingService.modifyBooking(booking, newTime);
+    	return bookingService.modifyBooking(booking, newTime, LocalTime.of(9,0));
     	
     }
     
     
+    public void adminCancelBooking(Booking booking, int role) {
+        if (role != 6) {
+            throw new RuntimeException("Unauthorized: Only admins can cancel bookings.");
+        }
+        bookingService.cancelBooking(booking);
+    }
+
+    public String adminModifyBooking(Booking oldBooking, String newTime, int role) {
+        if (role != 6) {
+            throw new RuntimeException("Unauthorized: Only admins can modify bookings.");
+        }
+        return bookingService.modifyBooking(oldBooking, newTime, LocalTime.of(9,0)); 
+    }
     
     
     
