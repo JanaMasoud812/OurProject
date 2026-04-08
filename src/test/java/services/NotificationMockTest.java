@@ -1,23 +1,22 @@
 package services;
-import models.Booking;
 
+import models.AppointmentSlot;
+import models.Booking;
 import org.junit.jupiter.api.*;
-import services.BookingService;
-import services.MockNotificationService;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeEach;
 import static org.junit.jupiter.api.Assertions.*;
+class NotificationMockTest {
+	
 
 
-public class NotificationTest {
-	
-	
-	
+
+
 	private BookingService service;
 	private MockNotificationService mockNotification;
 	private final String bookingsPath = "src/main/resources/booking.txt";
@@ -128,7 +127,5 @@ public class NotificationTest {
     void tearDown() throws IOException {
         Files.writeString(Paths.get(appointmentsPath), appointmentsBackup);
     }
-	
-	
-	
+
 }

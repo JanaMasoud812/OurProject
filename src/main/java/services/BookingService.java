@@ -19,6 +19,13 @@ public class BookingService {
         this.addObserver(new NotificationObserver(notificationService));
     }
     
+    private List<AppointmentSlot> appointments;
+    
+
+    public void setMockAppointments(List<AppointmentSlot> mockAppointments) {
+        this.appointments = mockAppointments;
+    }
+    
 	
     public void addObserver(AppointmentObserver observer) {
         observers.add(observer);

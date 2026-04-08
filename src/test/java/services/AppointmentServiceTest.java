@@ -1,8 +1,6 @@
 package services;
 
-import org.junit.jupiter.api.Test;
-import services.AppointmentSlotServices;
-import models.AppointmentSlot;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -11,11 +9,34 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class AppointmentSlotServiceTest {
+import models.AppointmentSlot;
 
-    @Test
+class AppointmentServiceTest {
+
+	@BeforeAll
+	static void setUpBeforeClass() throws Exception {
+	}
+
+	@AfterAll
+	static void tearDownAfterClass() throws Exception {
+	}
+
+	@BeforeEach
+	void setUp() throws Exception {
+	}
+
+	@AfterEach
+	void tearDown() throws Exception {
+	}
+	
+	
+	@Test
     void testViewAvailableSlots_ReturnAvailableSlots_Flexible() throws Exception {
         AppointmentSlotServices service = new AppointmentSlotServices("10:00", true);
 
@@ -88,4 +109,7 @@ public class AppointmentSlotServiceTest {
             service.viewAvailableSlots(new ArrayList<>());
         });
     }
+
+	
+
 }
