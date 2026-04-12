@@ -1,7 +1,8 @@
 package models;
 
 public class Booking {
-	
+	private AppointmentType type;
+
 	private String username;
 	private String time;
 	private String status;
@@ -37,15 +38,17 @@ public class Booking {
 	public void setParticipants(int participants)
 	{ this.participants= participants;}
 	
+	public Booking(String username, String time, String status, int duration, int participants, AppointmentType type) {
+	    this.username = username;
+	    this.time = time;
+	    this.status = status;
+	    this.duration = duration;
+	    this.participants = participants;
+	    this.type = type;
+	}
 	
-	public Booking( String username , String time , String status , int duration , int participants)
-	{
-		this.username= username;
-		this.time = time;
-		this.status= status;
-		this.duration=  duration;
-		this.participants=participants;
-		
+	public Booking(String username, String time, String status, int duration, int participants) {
+	    this(username, time, status, duration, participants, null);
 	}
 	
 	public void confirmBooking()
@@ -68,7 +71,13 @@ public class Booking {
 	
 	
 	
-	
+	public AppointmentType getType() {
+	    return type;
+	}
+
+	public void setType(AppointmentType type) {
+	    this.type = type;
+	}
 	
 
 	
