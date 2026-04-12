@@ -6,6 +6,6 @@ public class VirtualRule implements BookingRuleStrategy {
             return "Virtual: max duration is 60 min";
         if (booking.getParticipants() != 1)
             return "Virtual: only 1 participant allowed";
-        return null;
-    }
+        return null; 
+    } 
 }

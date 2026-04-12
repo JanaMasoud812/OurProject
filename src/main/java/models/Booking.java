@@ -51,6 +51,10 @@ public class Booking {
 	    this(username, time, status, duration, participants, null);
 	}
 	
+	
+	public Booking() {
+	}
+	
 	public void confirmBooking()
 	{
 		this.status="Confirmed";

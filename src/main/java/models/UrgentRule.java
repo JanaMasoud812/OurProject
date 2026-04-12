@@ -6,6 +6,6 @@ public class UrgentRule implements BookingRuleStrategy {
             return "Urgent: max duration is 30 min";
         if (booking.getParticipants() != 1)
             return "Urgent: only 1 participant allowed";
-        return null;
-    }
+        return null; 
+    } 
 }

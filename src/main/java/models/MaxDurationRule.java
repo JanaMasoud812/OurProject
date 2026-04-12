@@ -13,4 +13,4 @@ public class MaxDurationRule implements BookingRuleStrategy {
             return "Booking Failed: Duration Exceeded";
         return null;
     }
-}
+} 
