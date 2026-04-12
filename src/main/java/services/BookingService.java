@@ -1,6 +1,6 @@
 package services;
 
-import models.*; //this
+import models.*;
 
 import java.time.LocalTime;
 import java.time.LocalDate;
@@ -8,232 +8,231 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 public class BookingService {
-	// from this
-	private FileServices fileService = new FileServices();
-	private final List<BookingRuleStrategy> rules;
-	private final NotificationService notificationService;
-	private final List<AppointmentObserver> observers = new ArrayList<>();
 
-	public BookingService(NotificationService notificationService) {
-		this.notificationService = notificationService;
-		this.rules = new ArrayList<>();
-		this.rules.add(new MaxParticipantsRule(5));
-		this.rules.add(new MaxDurationRule(60));
+    private FileServices fileService = new FileServices();
+    private final List<BookingRuleStrategy> rules;
+    private final NotificationService notificationService;
+    private final List<AppointmentObserver> observers = new ArrayList<>();
 
-		this.addObserver(new NotificationObserver(notificationService));
-	}
+    public BookingService(NotificationService notificationService) {
+        this.notificationService = notificationService;
+        this.rules = new ArrayList<>();
+        this.rules.add(new MaxParticipantsRule(5));
+        this.rules.add(new MaxDurationRule(60));
 
-	private List<AppointmentSlot> appointments;
+        this.addObserver(new NotificationObserver(notificationService));
+    }
 
-	public void setMockAppointments(List<AppointmentSlot> mockAppointments) {
-		this.appointments = mockAppointments;
-	}
+    private List<AppointmentSlot> appointments;
 
-	public void addObserver(AppointmentObserver observer) {
-		observers.add(observer);
-	}
+    public void setMockAppointments(List<AppointmentSlot> mockAppointments) {
+        this.appointments = mockAppointments;
+    }
 
-	private void notifyConfirmed(Booking booking) {
-		for (AppointmentObserver o : observers) {
-			o.onBookingConfirmed(booking);
-		}
-	}
+    public void addObserver(AppointmentObserver observer) {
+        observers.add(observer);
+    }
 
-	private void notifyCancelled(Booking booking) {
-		for (AppointmentObserver o : observers) {
-			o.onBookingCancelled(booking);
-		}
-	}
+    private void notifyConfirmed(Booking booking) {
+        for (AppointmentObserver o : observers) {
+            o.onBookingConfirmed(booking);
+        }
+    }
 
-	public String bookAppointment(Booking booking) {
-		// AppointmentType type = booking.getType();
+    private void notifyCancelled(Booking booking) {
+        for (AppointmentObserver o : observers) {
+            o.onBookingCancelled(booking);
+        }
+    }
 
-		for (BookingRuleStrategy rule : rules) {
-			String error = rule.validate(booking);
-			if (error != null)
-				return error;
-		}
-		AppointmentType type = booking.getType();
+    // ✅ NEW: Email validation method
+    private boolean isValidEmail(String email) {
+        if (email == null) return false;
 
-		if (type == AppointmentType.URGENT) {
-			System.out.println("URGENT rules applied");
-			System.out.println("Applying URGENT rules");
-		} else if (type == AppointmentType.GROUP) {
-			System.out.println("GROUP rules applied");
-		}
-		List<String> slots = fileService.readFile("src/main/resources/appointments.txt");
-		List<String> updated = new ArrayList<>();
+        // لازم يكون فيه @ ونقطة بعده (مثل .com)
+        if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+            return false;
+        }
 
-		boolean booked = false;
+        // OPTIONAL (أقوى): السماح فقط بدومينات معروفة
+        return email.endsWith("@gmail.com") ||
+               email.endsWith("@yahoo.com") ||
+               email.endsWith("@hotmail.com");
+    }
 
-		for (String slot : slots) {
+    public String bookAppointment(Booking booking) {
 
-			if (slot.startsWith("Time") || slot.startsWith("Date")) {
-				updated.add(slot);
-				continue;
-			}
+        // 🔴 NEW CHECK (ONLY ADDITION)
+        if (!isValidEmail(booking.getUsername())) {
+            return "Booking Failed: Invalid Email Format";
+        }
 
-			String[] parts = slot.split(",");
+        for (BookingRuleStrategy rule : rules) {
+            String error = rule.validate(booking);
+            if (error != null)
+                return error;
+        }
 
-			String date = parts[0].trim();
-			String time = parts[1].trim();
-			String status = parts[2].trim();
-			int duration = Integer.parseInt(parts[3].trim());
-			int current = Integer.parseInt(parts[4].trim());
-			int max = Integer.parseInt(parts[5].trim());
+        AppointmentType type = booking.getType();
 
-			if (date.equals(booking.getDate()) && time.equals(booking.getTime()) && status.equals("Available")) {
+        if (type == AppointmentType.URGENT) {
+            System.out.println("URGENT rules applied");
+            System.out.println("Applying URGENT rules");
+        } else if (type == AppointmentType.GROUP) {
+            System.out.println("GROUP rules applied");
+        }
 
-				if (booking.getDuration() > duration) {
-					return "Booking Failed: Duration Exceeded";
-				}
+        List<String> slots = fileService.readFile("src/main/resources/appointments.txt");
+        List<String> updated = new ArrayList<>();
 
-				if (current + booking.getParticipants() > max) {
-					return "Booking Failed: Max participants exceeded";
-				}
+        boolean booked = false;
 
-				current += booking.getParticipants();
+        for (String slot : slots) {
 
-				if (current == max) {
-					status = "Unavailable";
-				}
+            if (slot.startsWith("Time") || slot.startsWith("Date")) {
+                updated.add(slot);
+                continue;
+            }
 
-				updated.add(date + "," + time + "," + status + "," + duration + "," + current + "," + max);
+            String[] parts = slot.split(",");
 
-				booking.confirmBooking();
-				booked = true;
+            String date = parts[0].trim();
+            String time = parts[1].trim();
+            String status = parts[2].trim();
+            int duration = Integer.parseInt(parts[3].trim());
+            int current = Integer.parseInt(parts[4].trim());
+            int max = Integer.parseInt(parts[5].trim());
 
-				try {
-					notifyConfirmed(booking);
-				} catch (Exception e) {
-					System.out.println("DEBUG: Caught notification error: " + e.getMessage());
-					return "Booking Failed: Notification Error (" + e.getMessage() + ")";
-				}
+            if (date.equals(booking.getDate())
+                    && time.equals(booking.getTime())
+                    && status.equals("Available")) {
 
-			} else {
-				updated.add(slot);
-			}
-		}
+                if (booking.getDuration() > duration) {
+                    return "Booking Failed: Duration Exceeded";
+                }
 
-		if (!booked) {
-			return "Booking Failed: Slot not available";
-		}
+                if (current + booking.getParticipants() > max) {
+                    return "Booking Failed: Max participants exceeded";
+                }
 
-		fileService.writeFile("src/main/resources/appointments.txt", updated);
+                current += booking.getParticipants();
 
-		fileService.appendFile("src/main/resources/booking.txt",
-				booking.getUsername() + "," +
-						booking.getDate() + "," +
-						booking.getTime() + "," +
-						booking.getStatus() + "," +
-						booking.getDuration() + "," +
-						booking.getParticipants());
+                if (current == max) {
+                    status = "Unavailable";
+                }
 
-		return "Booking Success";
+                updated.add(date + "," + time + "," + status + "," + duration + "," + current + "," + max);
 
-	}
+                booking.confirmBooking();
+                booked = true;
 
-	public void cancelBooking(Booking booking) {
-		booking.cancelBooking();
-		notifyCancelled(booking);
+                try {
+                    notifyConfirmed(booking);
+                } catch (Exception e) {
+                    System.out.println("DEBUG: Caught notification error: " + e.getMessage());
+                    return "Booking Failed: Notification Error (" + e.getMessage() + ")";
+                }
 
-		List<String> slots = fileService.readFile("src/main/resources/appointments.txt");
-		List<String> updated = new ArrayList<>();
+            } else {
+                updated.add(slot);
+            }
+        }
 
-		for (String slot : slots) {
+        if (!booked) {
+            return "Booking Failed: Slot not available";
+        }
 
-			if (slot.startsWith("Time") || slot.startsWith("Date")) {
-				updated.add(slot);
-				continue;
-			}
+        fileService.writeFile("src/main/resources/appointments.txt", updated);
 
-			String[] parts = slot.split(",");
+        fileService.appendFile("src/main/resources/booking.txt",
+                booking.getUsername() + "," +
+                        booking.getDate() + "," +
+                        booking.getTime() + "," +
+                        booking.getStatus() + "," +
+                        booking.getDuration() + "," +
+                        booking.getParticipants());
 
-			String date = parts[0].trim();
-			String time = parts[1].trim();
-			String status = parts[2].trim();
-			int duration = Integer.parseInt(parts[3].trim());
-			int current = Integer.parseInt(parts[4].trim());
-			int max = Integer.parseInt(parts[5].trim());
+        return "Booking Success";
+    }
 
-			if (date.equals(booking.getDate()) && time.equals(booking.getTime())) {
+    public void cancelBooking(Booking booking) {
+        booking.cancelBooking();
+        notifyCancelled(booking);
 
-				current -= booking.getParticipants();
-				if (current < 0)
-					current = 0;
+        List<String> slots = fileService.readFile("src/main/resources/appointments.txt");
+        List<String> updated = new ArrayList<>();
 
-				status = "Available";
+        for (String slot : slots) {
 
-				updated.add(date + "," + time + "," + status + "," + duration + "," + current + "," + max);
-			} else {
-				updated.add(slot);
-			}
-		}
+            if (slot.startsWith("Time") || slot.startsWith("Date")) {
+                updated.add(slot);
+                continue;
+            }
 
-		fileService.writeFile("src/main/resources/appointments.txt", updated);
-		List<String> bookings = fileService.readFile("src/main/resources/booking.txt");
-		List<String> updatedBookings = new ArrayList<>();
-		for (String line : bookings) {
-			if (!line.startsWith(booking.getUsername() + "," + booking.getDate() + "," + booking.getTime())) {
-				updatedBookings.add(line);
-			}
-		}
-		fileService.writeFile("src/main/resources/booking.txt", updatedBookings);
-	}
-	/*
-	 * public String modifyBooking(Booking oldBooking, String newTime) {
-	 * //future check
-	 * LocalTime now = LocalTime.now();
-	 * LocalTime appointmentTime = LocalTime.parse(oldBooking.getTime());
-	 * 
-	 * if(appointmentTime.isBefore(now)) {
-	 * return "Modify Failed: Cannot modify past appointments";
-	 * }
-	 * 
-	 * 
-	 * 
-	 * 
-	 * cancelBooking(oldBooking);
-	 * 
-	 * Booking newBooking = new Booking(
-	 * 
-	 * oldBooking.getUsername(),
-	 * newTime,
-	 * "Pending",
-	 * oldBooking.getDuration(),
-	 * oldBooking.getParticipants()
-	 * );
-	 * 
-	 * 
-	 * 
-	 * return bookAppointment(newBooking);
-	 * 
-	 * }
-	 * 
-	 */
+            String[] parts = slot.split(",");
 
-	public String modifyBooking(Booking oldBooking, String newDate, String newTime, LocalDateTime currentDateTime) {
-		LocalDateTime appointmentDateTime = LocalDateTime.of(LocalDate.parse(oldBooking.getDate()),
-				LocalTime.parse(oldBooking.getTime()));
+            String date = parts[0].trim();
+            String time = parts[1].trim();
+            String status = parts[2].trim();
+            int duration = Integer.parseInt(parts[3].trim());
+            int current = Integer.parseInt(parts[4].trim());
+            int max = Integer.parseInt(parts[5].trim());
 
-		if (appointmentDateTime.isBefore(currentDateTime)) {
-			return "Modify Failed: Cannot modify past appointments";
-		}
-		cancelBooking(oldBooking);
-		Booking newBooking = new Booking(
-				oldBooking.getUsername(),
-				newDate,
-				newTime,
-				"Pending",
-				oldBooking.getDuration(),
-				oldBooking.getParticipants());
-		return bookAppointment(newBooking);
-	}
+            if (date.equals(booking.getDate()) && time.equals(booking.getTime())) {
 
-	public String modifyBooking(Booking oldBooking, String newDate, String newTime) {
-		return modifyBooking(oldBooking, newDate, newTime, LocalDateTime.now());
-	}
+                current -= booking.getParticipants();
+                if (current < 0) current = 0;
 
-	// to this
+                status = "Available";
 
+                updated.add(date + "," + time + "," + status + "," + duration + "," + current + "," + max);
+            } else {
+                updated.add(slot);
+            }
+        }
+
+        fileService.writeFile("src/main/resources/appointments.txt", updated);
+
+        List<String> bookings = fileService.readFile("src/main/resources/booking.txt");
+        List<String> updatedBookings = new ArrayList<>();
+
+        for (String line : bookings) {
+            if (!line.startsWith(booking.getUsername() + "," +
+                    booking.getDate() + "," +
+                    booking.getTime())) {
+                updatedBookings.add(line);
+            }
+        }
+
+        fileService.writeFile("src/main/resources/booking.txt", updatedBookings);
+    }
+
+    public String modifyBooking(Booking oldBooking, String newDate, String newTime,
+                                LocalDateTime currentDateTime) {
+
+        LocalDateTime appointmentDateTime =
+                LocalDateTime.of(LocalDate.parse(oldBooking.getDate()),
+                        LocalTime.parse(oldBooking.getTime()));
+
+        if (appointmentDateTime.isBefore(currentDateTime)) {
+            return "Modify Failed: Cannot modify past appointments";
+        }
+
+        cancelBooking(oldBooking);
+
+        Booking newBooking = new Booking(
+                oldBooking.getUsername(),
+                newDate,
+                newTime,
+                "Pending",
+                oldBooking.getDuration(),
+                oldBooking.getParticipants()
+        );
+
+        return bookAppointment(newBooking);
+    }
+
+    public String modifyBooking(Booking oldBooking, String newDate, String newTime) {
+        return modifyBooking(oldBooking, newDate, newTime, LocalDateTime.now());
+    }
 }
