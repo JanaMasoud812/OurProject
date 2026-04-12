@@ -45,14 +45,21 @@ public class BookingService {
     }
 	
 	public String bookAppointment(Booking booking) {
+		//AppointmentType type = booking.getType();
+
 		
 		for (BookingRuleStrategy rule : rules) {
 		    String error = rule.validate(booking);
 		    if (error != null) return error;
 		}
-		
-		if (booking.getType() == AppointmentType.URGENT) {
+		AppointmentType type = booking.getType();
+
+		if (type == AppointmentType.URGENT) {
+		    System.out.println("URGENT rules applied");
 		    System.out.println("Applying URGENT rules");
+		} 
+		else if (type == AppointmentType.GROUP) {
+		    System.out.println("GROUP rules applied");
 		}
 		List<String> slots = fileService.readFile("src/main/resources/appointments.txt");
 		List<String> updated = new ArrayList<>();
