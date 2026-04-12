@@ -16,6 +16,7 @@ public class BookingService {
         this.rules = new ArrayList<>();
         this.rules.add(new MaxParticipantsRule(5));
         this.rules.add(new MaxDurationRule(60));
+       
         this.addObserver(new NotificationObserver(notificationService));
     }
     
@@ -50,6 +51,9 @@ public class BookingService {
 		    if (error != null) return error;
 		}
 		
+		if (booking.getType() == AppointmentType.URGENT) {
+		    System.out.println("Applying URGENT rules");
+		}
 		List<String> slots = fileService.readFile("src/main/resources/appointments.txt");
 		List<String> updated = new ArrayList<>();
 		
