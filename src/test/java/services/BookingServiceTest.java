@@ -107,11 +107,9 @@ class BookingServiceTest {
 	    
 	    @Test
 	    void testModifyPastBooking() {
-	    	Booking booking = new Booking("testUser", "2026-05-01", "00:01", "Pending", 30, 1);
+	    	Booking booking = new Booking("testUser@example.com", "2026-04-01", "00:01", "Pending", 30, 1);
 	    	String result = service.modifyBooking(booking, "2026-05-04", "13:00");
 	    	assertTrue(result.contains("Cannot modify past appointments"));
-	    	
-	    	
 	    }
 	    
 	    

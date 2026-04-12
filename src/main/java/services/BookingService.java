@@ -7,6 +7,24 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
+
+/**
+ * The BookingService class is responsible for managing all booking operations
+ * within the scheduling system.
+ *
+ * <p>It contains the core business logic for creating, cancelling, and modifying
+ * appointments while ensuring that all bookings follow predefined validation rules.</p>
+ *
+ * <p>This service integrates multiple design patterns:</p>
+ * <ul>
+ *   <li><b>Strategy Pattern</b> for applying flexible booking validation rules.</li>
+ *   <li><b>Observer Pattern</b> for notifying external components about booking events.</li>
+ * </ul>
+ *
+ * <p>It also handles persistence through FileServices to store and retrieve
+ * appointment and booking data from files.</p>
+ */
+
 public class BookingService {
 	// from this
 	private FileServices fileService = new FileServices();
@@ -14,6 +32,14 @@ public class BookingService {
 	private final NotificationService notificationService;
 	private final List<AppointmentObserver> observers = new ArrayList<>();
 
+	/**
+	 * Constructs a BookingService with the required NotificationService.
+	 *
+	 * <p>Initializes default booking rules and registers a notification observer
+	 * to handle booking-related events.</p>
+	 *
+	 * @param notificationService the service used to send notifications
+	 */
 	public BookingService(NotificationService notificationService) {
 		this.notificationService = notificationService;
 		this.rules = new ArrayList<>();
@@ -24,27 +50,61 @@ public class BookingService {
 	}
 
 	private List<AppointmentSlot> appointments;
-
+	/**
+	 * Sets mock appointment data for testing purposes.
+	 *
+	 * <p>This method is mainly used in testing environments to inject
+	 * predefined appointment slots instead of reading from files.</p>
+	 *
+	 * @param mockAppointments the list of appointment slots to be used as test data
+	 */
 	public void setMockAppointments(List<AppointmentSlot> mockAppointments) {
 		this.appointments = mockAppointments;
 	}
 
+	/**
+	 * Adds a new observer to receive booking events.
+	 *
+	 * @param observer the observer to be registered
+	 */
 	public void addObserver(AppointmentObserver observer) {
 		observers.add(observer);
 	}
-
+	/**
+	 * Notifies all registered observers that a booking has been confirmed.
+	 *
+	 * @param booking the booking that was successfully confirmed
+	 */
 	private void notifyConfirmed(Booking booking) {
 		for (AppointmentObserver o : observers) {
 			o.onBookingConfirmed(booking);
 		}
 	}
-
+	/**
+	 * Notifies all registered observers that a booking has been cancelled.
+	 *
+	 * @param booking the booking that was cancelled
+	 */
 	private void notifyCancelled(Booking booking) {
 		for (AppointmentObserver o : observers) {
 			o.onBookingCancelled(booking);
 		}
 	}
-
+	/**
+	 * Attempts to create a new booking for an appointment slot.
+	 *
+	 * <p>The method performs multiple steps:</p>
+	 * <ul>
+	 *   <li>Validates the booking using all defined rules.</li>
+	 *   <li>Checks appointment availability.</li>
+	 *   <li>Updates slot status and participant count.</li>
+	 *   <li>Persists booking data to files.</li>
+	 *   <li>Notifies observers upon successful booking.</li>
+	 * </ul>
+	 *
+	 * @param booking the booking request containing user and appointment details
+	 * @return a success message or failure reason
+	 */
 	public String bookAppointment(Booking booking) {
 		// AppointmentType type = booking.getType();
 
@@ -132,7 +192,19 @@ public class BookingService {
 		return "Booking Success";
 
 	}
-
+	/**
+	 * Cancels an existing booking and updates the system state.
+	 *
+	 * <p>This includes:</p>
+	 * <ul>
+	 *   <li>Releasing reserved slots</li>
+	 *   <li>Updating appointment availability</li>
+	 *   <li>Removing booking from storage</li>
+	 *   <li>Notifying observers about cancellation</li>
+	 * </ul>
+	 *
+	 * @param booking the booking to be cancelled
+	 */
 	public void cancelBooking(Booking booking) {
 		booking.cancelBooking();
 		notifyCancelled(booking);
@@ -180,44 +252,27 @@ public class BookingService {
 		}
 		fileService.writeFile("src/main/resources/booking.txt", updatedBookings);
 	}
-	/*
-	 * public String modifyBooking(Booking oldBooking, String newTime) {
-	 * //future check
-	 * LocalTime now = LocalTime.now();
-	 * LocalTime appointmentTime = LocalTime.parse(oldBooking.getTime());
-	 * 
-	 * if(appointmentTime.isBefore(now)) {
-	 * return "Modify Failed: Cannot modify past appointments";
-	 * }
-	 * 
-	 * 
-	 * 
-	 * 
-	 * cancelBooking(oldBooking);
-	 * 
-	 * Booking newBooking = new Booking(
-	 * 
-	 * oldBooking.getUsername(),
-	 * newTime,
-	 * "Pending",
-	 * oldBooking.getDuration(),
-	 * oldBooking.getParticipants()
-	 * );
-	 * 
-	 * 
-	 * 
-	 * return bookAppointment(newBooking);
-	 * 
-	 * }
-	 * 
+	
+	/**
+	 * Modifies an existing booking by replacing it with a new one.
+	 *
+	 * <p>This method prevents modification of past appointments by comparing
+	 * the booking time with the current system time.</p>
+	 *
+	 * <p>If valid, the old booking is cancelled and a new booking is created.</p>
+	 *
+	 * @param oldBooking the existing booking
+	 * @param newDate the updated date
+	 * @param newTime the updated time
+	 * @param currentDateTime the current system date and time
+	 * @return a success or failure message
 	 */
-
 	public String modifyBooking(Booking oldBooking, String newDate, String newTime, LocalDateTime currentDateTime) {
 		LocalDateTime appointmentDateTime = LocalDateTime.of(LocalDate.parse(oldBooking.getDate()),
 				LocalTime.parse(oldBooking.getTime()));
 
 		if (appointmentDateTime.isBefore(currentDateTime)) {
-			return "Modify Failed: Cannot modify past appointments";
+			return "Cannot modify past appointments";
 		}
 		cancelBooking(oldBooking);
 		Booking newBooking = new Booking(
@@ -229,7 +284,14 @@ public class BookingService {
 				oldBooking.getParticipants());
 		return bookAppointment(newBooking);
 	}
-
+	/**
+	 * Modifies an existing booking using the current system time.
+	 *
+	 * @param oldBooking the existing booking
+	 * @param newDate the updated date
+	 * @param newTime the updated time
+	 * @return a success or failure message
+	 */
 	public String modifyBooking(Booking oldBooking, String newDate, String newTime) {
 		return modifyBooking(oldBooking, newDate, newTime, LocalDateTime.now());
 	}

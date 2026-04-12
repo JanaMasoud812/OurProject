@@ -289,12 +289,9 @@ class AdminServicesTest {
 	@Test
 	void shouldRejectPastTime() {
 	    BookingService bookingService = new BookingService(new MockNotificationService());
-	    Booking booking = new Booking("testUser", "2026-05-01", "07:00", "Pending", 30, 1);
-
+	    Booking booking = new Booking("testUser@example.com", "2026-04-01", "07:00", "Pending", 30, 1);
 	    bookingService.bookAppointment(booking);
-
 	    String result = bookingService.modifyBooking(booking, "2026-05-04", "13:00", LocalDateTime.of(LocalDate.now(), LocalTime.of(8, 0)));
-
 	    assertTrue(result.contains("Cannot modify past"));
 	}
 	
