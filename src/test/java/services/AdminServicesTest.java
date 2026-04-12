@@ -152,17 +152,17 @@ class AdminServicesTest {
 	    AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
 	    String time = "18:00";
 
-	    admin.removeSlots(time);   
+	    admin.removeSlots("2026-05-01", time);   
 
-	    admin.addSlots(time);
+	    admin.addSlots("2026-05-01", time);
 
 	    FileServices file = new FileServices();
 	    List<String> slots = file.readFile("src/main/resources/appointments.txt");
 
-	    boolean found = slots.stream().anyMatch(s -> s.equals(time + ",Available,30,0,5"));
+	    boolean found = slots.stream().anyMatch(s -> s.equals("2026-05-01," + time + ",Available,30,0,5"));
 	    assertTrue(found);
 
-	    admin.removeSlots(time); 
+	    admin.removeSlots("2026-05-01", time); 
 	}
 
 	@Test
@@ -170,18 +170,18 @@ class AdminServicesTest {
 	    AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
 	    String time = "19:00";
 
-	    admin.removeSlots(time); 
-	    admin.addSlots(time);
+	    admin.removeSlots("2026-05-01", time); 
+	    admin.addSlots("2026-05-01", time);
 
 	    FileServices file = new FileServices();
 	    List<String> slotsBefore = file.readFile("src/main/resources/appointments.txt");
 	    assertTrue(slotsBefore.stream()
-	        .anyMatch(s -> s.trim().equals(time + ",Available,30,0,5")));
+	        .anyMatch(s -> s.trim().equals("2026-05-01," + time + ",Available,30,0,5")));
 
-	    admin.removeSlots(time);
+	    admin.removeSlots("2026-05-01", time);
 	    List<String> slotsAfter = file.readFile("src/main/resources/appointments.txt");
 	    assertFalse(slotsAfter.stream()
-	        .anyMatch(s -> s.trim().equals(time + ",Available,30,0,5")));
+	        .anyMatch(s -> s.trim().equals("2026-05-01," + time + ",Available,30,0,5")));
 	}
 	
 	@Test
@@ -189,19 +189,19 @@ class AdminServicesTest {
 	    AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
 	    String time = "20:00";
 
-	    admin.removeSlots(time);
-	    admin.addSlots(time);
+	    admin.removeSlots("2026-05-01", time);
+	    admin.addSlots("2026-05-01", time);
 
-	    admin.modifySlots(time, "Unavailable");
+	    admin.modifySlots("2026-05-01", time, "Unavailable");
 
 	    FileServices file = new FileServices();
 	    List<String> slots = file.readFile("src/main/resources/appointments.txt");
 	    assertTrue(slots.stream()
-	        .anyMatch(s -> s.trim().startsWith(time + ",Unavailable")));
+	        .anyMatch(s -> s.trim().startsWith("2026-05-01," + time + ",Unavailable")));
 	    assertFalse(slots.stream()
-	        .anyMatch(s -> s.trim().startsWith(time + ",Available")));
+	        .anyMatch(s -> s.trim().startsWith("2026-05-01," + time + ",Available")));
 
-	    admin.removeSlots(time);
+	    admin.removeSlots("2026-05-01", time);
 	}
 	
 	@Test
@@ -209,11 +209,11 @@ class AdminServicesTest {
 	    AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
 
 	    String time = "21:00";
-	    admin.addSlots(time);
+	    admin.addSlots("2026-05-01", time);
 
 	    assertDoesNotThrow(() -> admin.viewSlots());
 
-	    admin.removeSlots(time);
+	    admin.removeSlots("2026-05-01", time);
 	}
 	
 	
@@ -255,7 +255,7 @@ class AdminServicesTest {
 	@Test
 	void testAdminCancelUserBooking() {
 	    BookingService bookingService = new BookingService(new MockNotificationService());
-	    Booking booking = new Booking("testUser", "12:30", "Pending", 30, 1);
+	    Booking booking = new Booking("testUser", "2026-05-03", "12:30", "Pending", 30, 1);
 	    bookingService.bookAppointment(booking);
 
 	    AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
@@ -269,11 +269,11 @@ class AdminServicesTest {
 	@Test
 	void testAdminModifyUserBooking() {
 	    BookingService bookingService = new BookingService(new MockNotificationService());
-	    Booking booking = new Booking("testUser", "12:30", "Pending", 30, 1);
+	    Booking booking = new Booking("testUser", "2026-05-03", "12:30", "Pending", 30, 1);
 	    bookingService.bookAppointment(booking);
 
 	    AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
-	    String result = admin.modifyUserBooking(booking, "13:00");
+	    String result = admin.modifyUserBooking(booking, "2026-05-04", "13:00");
 	    assertEquals("Booking Success", result);
 	}
 	
@@ -286,11 +286,11 @@ class AdminServicesTest {
 	@Test
 	void shouldRejectPastTime() {
 	    BookingService bookingService = new BookingService(new MockNotificationService());
-	    Booking booking = new Booking("testUser", "07:00", "Pending", 30, 1);
+	    Booking booking = new Booking("testUser", "2026-05-01", "07:00", "Pending", 30, 1);
 
 	    bookingService.bookAppointment(booking);
 
-	    String result = bookingService.modifyBooking(booking, "13:00", LocalTime.of(8, 0));
+	    String result = bookingService.modifyBooking(booking, "2026-05-04", "13:00", LocalTime.of(8, 0));
 
 	    assertTrue(result.contains("Cannot modify past"));
 	}
@@ -301,11 +301,11 @@ class AdminServicesTest {
 	@Test
 	void testAdminModifyUserBooking() {
 	    AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
-	    Booking booking = new Booking("testUser", "11:30", "Pending", 30, 1);
+	    Booking booking = new Booking("testUser", "2026-05-02", "11:30", "Pending", 30, 1);
 
 	    admin.getBookingService().bookAppointment(booking);
 
-	    String result = admin.modifyUserBooking(booking, "13:00");
+	    String result = admin.modifyUserBooking(booking, "2026-05-04", "13:00");
 
 	    assertEquals("Booking Success", result);
 	}
@@ -313,7 +313,7 @@ class AdminServicesTest {
     @Test
     void testAdminCancelBooking_Unauthorized() {
         AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
-        Booking booking = new Booking("fawzia@gmail.com", "12:30", "Pending", 30, 1);
+        Booking booking = new Booking("fawzia@gmail.com", "2026-05-03", "12:30", "Pending", 30, 1);
 
         admin.getBookingService().bookAppointment(booking);
 
@@ -327,11 +327,11 @@ class AdminServicesTest {
     @Test
     void testAdminModifyBooking_Success() {
         AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
-        Booking booking = new Booking("fawzia@gmail.com", "11:30", "Pending", 30, 1);
+        Booking booking = new Booking("fawzia@gmail.com", "2026-05-02", "11:30", "Pending", 30, 1);
 
         admin.getBookingService().bookAppointment(booking);
 
-        String result = admin.adminModifyBooking(booking, "13:00", 6);
+        String result = admin.adminModifyBooking(booking, "2026-05-04", "13:00", 6);
 
         assertEquals("Booking Success", result);
     }
@@ -339,12 +339,12 @@ class AdminServicesTest {
     @Test
     void testAdminModifyBooking_Unauthorized() {
         AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
-        Booking booking = new Booking("fawzia@gmail.com", "22:00", "Pending", 30, 1);
+        Booking booking = new Booking("fawzia@gmail.com", "2026-05-01", "22:00", "Pending", 30, 1);
 
         admin.getBookingService().bookAppointment(booking);
 
         Exception exception = assertThrows(RuntimeException.class, () -> {
-            admin.adminModifyBooking(booking, "13:00", 5);
+            admin.adminModifyBooking(booking, "2026-05-04", "13:00", 5);
         });
 
         assertEquals("Unauthorized: Only admins can modify bookings.", exception.getMessage());
@@ -353,7 +353,7 @@ class AdminServicesTest {
     @Test
     void testAdminCancelBooking_Success() {
         AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
-        Booking booking = new Booking("fawzia@gmail.com", "12:30", "Pending", 30, 1);
+        Booking booking = new Booking("fawzia@gmail.com", "2026-05-03", "12:30", "Pending", 30, 1);
 
         admin.getBookingService().bookAppointment(booking);
 

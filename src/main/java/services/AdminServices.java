@@ -58,20 +58,22 @@ public class AdminServices extends Admin {
     }
     
     @Override
-    public void addSlots(String time) {
-        fileservice.appendFile("src/main/resources/appointments.txt", time+ ",Available,30,0,5");
+    public void addSlots(String date, String time) {
+        fileservice.appendFile("src/main/resources/appointments.txt", date + "," + time + ",Available,30,0,5");
     }
     
     @Override
-    public void removeSlots(String time) {
+    public void removeSlots(String date, String time) {
 
         List<String> slots = fileservice.readFile("src/main/resources/appointments.txt");
         List<String> updated = new ArrayList<>();
 
         for (String slot : slots) {
             String[] parts = slot.split(",");
-            if (!parts[0].equals(time)) {
+            if (parts.length > 1 && !(parts[0].equals(date) && parts[1].equals(time))) {
                 updated.add(slot);
+            } else if (parts.length <= 1 || slot.startsWith("Time") || slot.startsWith("Date")) {
+            	updated.add(slot);
             }
         }
 
@@ -79,26 +81,27 @@ public class AdminServices extends Admin {
     }
     
     @Override
-    public void modifySlots(String time, String status) {
+    public void modifySlots(String date, String time, String status) {
         List<String> slots = fileservice.readFile("src/main/resources/appointments.txt");
         List<String> updated = new ArrayList<>();
 
         for (String slot : slots) {
         	
-        	if(slot.startsWith("Time")) {
+        	if(slot.startsWith("Time") || slot.startsWith("Date")) {
         		updated.add(slot);
                 continue;
         			}
         	
             String[] parts = slot.split(",");
             
-            String slotTime = parts[0];
-            String duration = parts[2];
-            String current = parts[3];
-            String max = parts[4]; 
+            String slotDate = parts[0];
+            String slotTime = parts[1];
+            String duration = parts[3];
+            String current = parts[4];
+            String max = parts[5]; 
             
-            if (parts[0].equals(time)) {
-                updated.add(slotTime + "," + status + "," + duration + "," + current + "," + max);
+            if (parts[0].equals(date) && parts[1].equals(time)) {
+                updated.add(slotDate + "," + slotTime + "," + status + "," + duration + "," + current + "," + max);
             } else {
                 updated.add(slot);
             }
@@ -220,8 +223,8 @@ public class AdminServices extends Admin {
     
     
     @Override
-    public String modifyUserBooking(Booking booking, String newTime) {
-    	return bookingService.modifyBooking(booking, newTime, LocalTime.of(9,0));
+    public String modifyUserBooking(Booking booking, String newDate, String newTime) {
+    	return bookingService.modifyBooking(booking, newDate, newTime, LocalTime.of(9,0));
     	
     }
     
@@ -233,11 +236,11 @@ public class AdminServices extends Admin {
         bookingService.cancelBooking(booking);
     }
 
-    public String adminModifyBooking(Booking oldBooking, String newTime, int role) {
+    public String adminModifyBooking(Booking oldBooking, String newDate, String newTime, int role) {
         if (role != 6) {
             throw new RuntimeException("Unauthorized: Only admins can modify bookings.");
         }
-        return bookingService.modifyBooking(oldBooking, newTime, LocalTime.of(9,0)); 
+        return bookingService.modifyBooking(oldBooking, newDate, newTime, LocalTime.of(9,0)); 
     }
     
     

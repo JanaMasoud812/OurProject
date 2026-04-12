@@ -19,9 +19,9 @@ public abstract class Admin {
 	public abstract String login (String username, String password);
 	public abstract void logout();
 	public abstract void viewSlots();
-	public abstract void addSlots(String time);
-	public abstract void removeSlots(String time);
-	public abstract void modifySlots(String time, String status);
+	public abstract void addSlots(String date, String time);
+	public abstract void removeSlots(String date, String time);
+	public abstract void modifySlots(String date, String time, String status);
 	public abstract void setUsername(String username);
 	public abstract String getUsername();
 	public abstract void setPassword(String password);
@@ -32,5 +32,5 @@ public abstract class Admin {
     public abstract void setId(int id);
     public abstract int getId();
     public abstract void cancelUserBooking(Booking booking );
-    public abstract String modifyUserBooking(Booking booking, String newTime );
+    public abstract String modifyUserBooking(Booking booking, String newDate, String newTime );
 }

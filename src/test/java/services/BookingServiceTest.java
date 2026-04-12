@@ -43,7 +43,7 @@ class BookingServiceTest {
 
 	    @Test
 	    void testSuccessfulBooking() {
-	        Booking booking = new Booking("testUser", "10:00", "Confirmed", 30, 1);
+	        Booking booking = new Booking("testUser", "2026-05-01", "10:00", "Confirmed", 30, 1);
 	        String result = service.bookAppointment(booking);
 	        assertEquals("Booking Success", result);
 	        assertEquals("Confirmed", booking.getStatus());
@@ -60,28 +60,28 @@ class BookingServiceTest {
 
 	    @Test
 	    void testBookingMaxParticipantsExceeded() {
-	        Booking booking = new Booking("testUser", "10:00", "Confirmed", 30, 10);
+	        Booking booking = new Booking("testUser", "2026-05-01", "10:00", "Confirmed", 30, 10);
 	        String result = service.bookAppointment(booking);
 	        assertTrue(result.contains("Max participants exceeded"));
 	    }
 
 	    @Test
 	    void testBookingDurationExceeded() {
-	        Booking booking = new Booking("testUser", "10:00", "Confirmed", 120, 1);
+	        Booking booking = new Booking("testUser", "2026-05-01", "10:00", "Confirmed", 120, 1);
 	        String result = service.bookAppointment(booking);
 	        assertTrue(result.contains("Duration Exceeded"));
 	    }
 
 	    @Test
 	    void testBookingUnavailableSlot() {
-	        Booking booking = new Booking("testUser", "10:30", "Confirmed", 30, 1); // 10:30 is Unavailable in your file
+	        Booking booking = new Booking("testUser", "2026-05-01", "10:30", "Confirmed", 30, 1); // 10:30 is Unavailable in your file
 	        String result = service.bookAppointment(booking);
 	        assertTrue(result.contains("Slot not available"));
 	    }
 
 	    @Test
 	    void testCancelBooking() throws IOException {
-	        Booking booking = new Booking("testUser", "10:00", "Confirmed", 30, 1);
+	        Booking booking = new Booking("testUser", "2026-05-01", "10:00", "Confirmed", 30, 1);
 	        service.bookAppointment(booking);
 
 	        service.cancelBooking(booking);
@@ -89,24 +89,24 @@ class BookingServiceTest {
 
 	        // check if appointment slot is available again
 	        List<String> appointments = Files.readAllLines(appointmentsPath);
-	        boolean found = appointments.stream().anyMatch(line -> line.startsWith("10:00") && line.contains("Available"));
+	        boolean found = appointments.stream().anyMatch(line -> line.startsWith("2026-05-01,10:00") && line.contains("Available"));
 	        assertTrue(found);
 	    }
 	    
 	    @Test
 	    void testModifyBooking() throws IOException {
-	        Booking booking = new Booking("testUser", "12:30", "Pending", 30, 1);
+	        Booking booking = new Booking("testUser", "2026-05-03", "12:30", "Pending", 30, 1);
 	        service.bookAppointment(booking);
 	        
-	        String result = service.modifyBooking(booking, "13:00", LocalTime.of(8, 0));
+	        String result = service.modifyBooking(booking, "2026-05-04", "13:00", LocalTime.of(8, 0));
 	        assertEquals("Booking Success", result);
 	    }
 	    
 	    
 	    @Test
 	    void testModifyPastBooking() {
-	    	Booking booking = new Booking("testUser", "00:01", "Pending", 30, 1);
-	    	String result = service.modifyBooking(booking, "13:00");
+	    	Booking booking = new Booking("testUser", "2026-05-01", "00:01", "Pending", 30, 1);
+	    	String result = service.modifyBooking(booking, "2026-05-04", "13:00");
 	    	assertTrue(result.contains("Cannot modify past appointments"));
 	    	
 	    	

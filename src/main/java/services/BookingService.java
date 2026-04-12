@@ -68,20 +68,21 @@ public class BookingService {
 		
 		for (String slot : slots) {
 
-    if (slot.startsWith("Time")) { 
+    if (slot.startsWith("Time") || slot.startsWith("Date")) { 
         updated.add(slot);
         continue;
     }
 
     String[] parts = slot.split(",");
 
-    String time = parts[0].trim();
-    String status = parts[1].trim();
-    int duration = Integer.parseInt(parts[2].trim());
-    int current = Integer.parseInt(parts[3].trim());
-    int max = Integer.parseInt(parts[4].trim());
+    String date = parts[0].trim();
+    String time = parts[1].trim();
+    String status = parts[2].trim();
+    int duration = Integer.parseInt(parts[3].trim());
+    int current = Integer.parseInt(parts[4].trim());
+    int max = Integer.parseInt(parts[5].trim());
 
-    if (time.equals(booking.getTime()) && status.equals("Available")) {
+    if (date.equals(booking.getDate()) && time.equals(booking.getTime()) && status.equals("Available")) {
 
         if (booking.getDuration() > duration) {
             return "Booking Failed: Duration Exceeded";
@@ -97,7 +98,7 @@ public class BookingService {
             status = "Unavailable";
         }
 
-        updated.add(time + "," + status + "," + duration + "," + current + "," + max);
+        updated.add(date + "," + time + "," + status + "," + duration + "," + current + "," + max);
 
         booking.confirmBooking();
         booked = true;
@@ -119,6 +120,7 @@ public class BookingService {
 		
 	   fileService.appendFile("src/main/resources/booking.txt",
                booking.getUsername() + "," +
+               booking.getDate() + "," +
                booking.getTime() + "," +
                booking.getStatus() + "," +
                booking.getDuration() + "," +
@@ -137,27 +139,28 @@ public class BookingService {
 
 	    for (String slot : slots) {
 
-	        if (slot.startsWith("Time")) {
+	        if (slot.startsWith("Time") || slot.startsWith("Date")) {
 	            updated.add(slot);
 	            continue;
 	        }
 
 	        String[] parts = slot.split(",");
 
-	        String time = parts[0].trim();
-	        String status = parts[1].trim();
-	        int duration = Integer.parseInt(parts[2].trim());
-	        int current = Integer.parseInt(parts[3].trim());
-	        int max = Integer.parseInt(parts[4].trim());
+	        String date = parts[0].trim();
+	        String time = parts[1].trim();
+	        String status = parts[2].trim();
+	        int duration = Integer.parseInt(parts[3].trim());
+	        int current = Integer.parseInt(parts[4].trim());
+	        int max = Integer.parseInt(parts[5].trim());
 
-	        if (time.equals(booking.getTime())) {
+	        if (date.equals(booking.getDate()) && time.equals(booking.getTime())) {
 
 	            current -= booking.getParticipants();
 	            if (current < 0) current = 0;
 
 	            status = "Available";
 
-	            updated.add(time + "," + status + "," + duration + "," + current + "," + max);
+	            updated.add(date + "," + time + "," + status + "," + duration + "," + current + "," + max);
 	        } else {
 	            updated.add(slot);
 	        }
@@ -167,7 +170,7 @@ public class BookingService {
 	    List<String> bookings = fileService.readFile("src/main/resources/booking.txt");
 	    List<String> updatedBookings = new ArrayList<>();
 	    for (String line : bookings) {
-	        if (!line.startsWith(booking.getUsername() + "," + booking.getTime())) {
+	        if (!line.startsWith(booking.getUsername() + "," + booking.getDate() + "," + booking.getTime())) {
 	            updatedBookings.add(line);
 	        }
 	    }
@@ -205,13 +208,14 @@ public class BookingService {
 	
 	*/
 	
-	public String modifyBooking(Booking oldBooking, String newTime, LocalTime currentTime) {
+	public String modifyBooking(Booking oldBooking, String newDate, String newTime, LocalTime currentTime) {
 	    if(LocalTime.parse(oldBooking.getTime()).isBefore(currentTime)) {
 	        return "Modify Failed: Cannot modify past appointments";
 	    }
 	    cancelBooking(oldBooking);
 	    Booking newBooking = new Booking(
 	        oldBooking.getUsername(),
+	        newDate,
 	        newTime,
 	        "Pending",
 	        oldBooking.getDuration(),
@@ -220,8 +224,8 @@ public class BookingService {
 	    return bookAppointment(newBooking);
 	}
 
-	public String modifyBooking(Booking oldBooking, String newTime) {
-	    return modifyBooking(oldBooking, newTime, LocalTime.now());
+	public String modifyBooking(Booking oldBooking, String newDate, String newTime) {
+	    return modifyBooking(oldBooking, newDate, newTime, LocalTime.now());
 	}
 	
 	

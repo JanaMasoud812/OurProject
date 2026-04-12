@@ -15,6 +15,7 @@ public class TestNotification {
 // حجز جديد
         Booking booking = new Booking(
                 "fawzia@gmail.com",
+                "2026-05-03",
                 "12:30",
                 "Pending",
                 30,  

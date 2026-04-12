@@ -4,6 +4,7 @@ public class Booking {
 	private AppointmentType type;
 
 	private String username;
+	private String date;
 	private String time;
 	private String status;
 	private int duration;
@@ -15,6 +16,10 @@ public class Booking {
 	public void setUsername(String username)
 	{ this.username= username;}
 	
+	public String getDate()
+	{ return date;}
+	public void setDate(String date)
+	{ this.date= date;}
 	
 	public String getTime()
 	{ return time;}
@@ -38,8 +43,9 @@ public class Booking {
 	public void setParticipants(int participants)
 	{ this.participants= participants;}
 	
-	public Booking(String username, String time, String status, int duration, int participants, AppointmentType type) {
+	public Booking(String username, String date, String time, String status, int duration, int participants, AppointmentType type) {
 	    this.username = username;
+	    this.date = date;
 	    this.time = time;
 	    this.status = status;
 	    this.duration = duration;
@@ -47,8 +53,8 @@ public class Booking {
 	    this.type = type;
 	}
 	
-	public Booking(String username, String time, String status, int duration, int participants) {
-	    this(username, time, status, duration, participants, null);
+	public Booking(String username, String date, String time, String status, int duration, int participants) {
+	    this(username, date, time, status, duration, participants, null);
 	}
 	
 	

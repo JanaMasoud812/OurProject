@@ -24,7 +24,7 @@ class BookingTest {
 	 
 	 @Test
 	    void testConstructorAndGetters() {
-	        Booking booking = new Booking("Jana", "10:00", "Confirmed", 30, 2);
+	        Booking booking = new Booking("Jana", "2026-05-01", "10:00", "Confirmed", 30, 2);
 	        assertEquals("Jana", booking.getUsername());
 	        assertEquals("10:00", booking.getTime());
 	        assertEquals("Confirmed", booking.getStatus());
@@ -34,28 +34,28 @@ class BookingTest {
 
 	    @Test
 	    void testConfirmBooking() {
-	        Booking booking = new Booking("Jana", "10:00", "canceled", 30, 2);
+	        Booking booking = new Booking("Jana", "2026-05-01", "10:00", "canceled", 30, 2);
 	        booking.confirmBooking();
 	        assertEquals("Confirmed", booking.getStatus());
 	    }
 
 	    @Test
 	    void testCancelBooking() {
-	        Booking booking = new Booking("Jana", "10:00", "Confirmed", 30, 2);
+	        Booking booking = new Booking("Jana", "2026-05-01", "10:00", "Confirmed", 30, 2);
 	        booking.cancelBooking();
 	        assertEquals("canceled", booking.getStatus());
 	    }
 
 	    @Test
 	    void testIsFull() {
-	        Booking booking = new Booking("Jana", "10:00", "Confirmed", 30, 5);
+	        Booking booking = new Booking("Jana", "2026-05-01", "10:00", "Confirmed", 30, 5);
 	        assertTrue(booking.isFull(5));
 	        assertFalse(booking.isFull(6));
 	    }
 
 	    @Test
 	    void testSetters() {
-	        Booking booking = new Booking("Jana", "10:00", "Confirmed", 30, 2);
+	        Booking booking = new Booking("Jana", "2026-05-01", "10:00", "Confirmed", 30, 2);
 
 	        booking.setUsername("Lana");
 	        booking.setTime("11:00");

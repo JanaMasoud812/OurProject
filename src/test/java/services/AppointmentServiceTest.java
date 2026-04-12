@@ -38,7 +38,7 @@ class AppointmentServiceTest {
 	
 	@Test
     void testViewAvailableSlots_ReturnAvailableSlots_Flexible() throws Exception {
-        AppointmentSlotServices service = new AppointmentSlotServices("10:00", true);
+        AppointmentSlotServices service = new AppointmentSlotServices("2026-05-01", "10:00", true);
 
         // استدعاء الفنكشن لقراءة المواعيد المتاحة
         List<AppointmentSlot> availableSlots = service.viewAvailableSlots(new ArrayList<>());
@@ -53,7 +53,7 @@ class AppointmentServiceTest {
         List<String> availableFromFile = reader.lines()
         		.filter(line -> {
         		    String[] parts = line.split(",");
-        		    return parts.length > 1 && parts[1].trim().equalsIgnoreCase("Available");
+        		    return parts.length > 2 && parts[2].trim().equalsIgnoreCase("Available");
         		})
                                                .collect(Collectors.toList());
 
@@ -65,7 +65,7 @@ class AppointmentServiceTest {
 
         // تحقق أن كل موعد موجود في النتيجة
         for (String line : availableFromFile) {
-            String time = line.split(",")[0].trim();
+            String time = line.split(",")[1].trim();
             boolean found = availableSlots.stream().anyMatch(slot -> slot.getTime().equals(time));
             assertTrue(found, "Slot " + time + " should be in available slots");
         }
@@ -73,7 +73,7 @@ class AppointmentServiceTest {
 
     @Test
     void test_IgnoresUnavailableSlots() {
-        AppointmentSlotServices service = new AppointmentSlotServices("10:00", true);
+        AppointmentSlotServices service = new AppointmentSlotServices("2026-05-01", "10:00", true);
         List<AppointmentSlot> result = service.viewAvailableSlots(new ArrayList<>());
 
         for (AppointmentSlot slot : result) {
@@ -83,14 +83,14 @@ class AppointmentServiceTest {
 
     @Test
     void test_ReturnTypeIsList() {
-        AppointmentSlotServices service = new AppointmentSlotServices("10:00", true);
+        AppointmentSlotServices service = new AppointmentSlotServices("2026-05-01", "10:00", true);
         List<AppointmentSlot> result = service.viewAvailableSlots(new ArrayList<>());
         assertTrue(result instanceof List);
     }
 
     @Test
     void test_SizeCheck() {
-        AppointmentSlotServices service = new AppointmentSlotServices("10:00", true);
+        AppointmentSlotServices service = new AppointmentSlotServices("2026-05-01", "10:00", true);
         List<AppointmentSlot> result = service.viewAvailableSlots(new ArrayList<>());
         assertTrue(result.size() >= 0);
     }
@@ -98,7 +98,7 @@ class AppointmentServiceTest {
     @Test
     void test_ExceptionHandling() {
         AppointmentSlotServices service =
-                new AppointmentSlotServices("10:00", true) {
+                new AppointmentSlotServices("2026-05-01", "10:00", true) {
                     @Override
                     public List<AppointmentSlot> viewAvailableSlots(List<AppointmentSlot> slots) {
                         throw new RuntimeException();

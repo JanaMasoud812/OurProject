@@ -39,7 +39,7 @@ class NotificationMockTest {
 	
 	@Test
 	void testSuccessfulBooking() {
-		Booking booking = new Booking("fawzia","10:00", "Pending",30,1);
+		Booking booking = new Booking("fawzia", "2026-05-01", "10:00", "Pending",30,1);
 		service.bookAppointment(booking);
 		
 		List<String>messages=mockNotification.getSentMessages();
@@ -54,7 +54,7 @@ class NotificationMockTest {
 	
 	@Test
 	void testUnavailableSlot() {
-		Booking booking = new Booking("user1","10:30","Pending",30,1);
+		Booking booking = new Booking("user1", "2026-05-01", "10:30","Pending",30,1);
 		service.bookAppointment(booking);
 		List<String>messages=mockNotification.getSentMessages();
 		assertEquals(0, messages.size());
@@ -65,7 +65,7 @@ class NotificationMockTest {
 	
 	@Test
 	void testForMaxParticipation() {
-		Booking booking = new Booking("user2","10:30","Pending",30,10);
+		Booking booking = new Booking("user2", "2026-05-01", "10:30","Pending",30,10);
 		service.bookAppointment(booking);
 		
 		List<String> messages = mockNotification.getSentMessages();
@@ -77,7 +77,7 @@ class NotificationMockTest {
 	
 	@Test
 	void testForDuration() {
-		Booking booking = new Booking("user3","10:00","Pending",120,1);
+		Booking booking = new Booking("user3", "2026-05-01", "10:00","Pending",120,1);
 		service.bookAppointment(booking);
 		
 		List<String> messages = mockNotification.getSentMessages();
@@ -90,8 +90,8 @@ class NotificationMockTest {
 	
 	@Test 
 	void testMultipleNOtificationForMultipleBookings() {
-		Booking booking1= new Booking("user1","12:30","Pending",30,1);
-		Booking booking2 = new Booking("user2","11:30","Pending",30,1);
+		Booking booking1= new Booking("user1", "2026-05-03", "12:30","Pending",30,1);
+		Booking booking2 = new Booking("user2", "2026-05-02", "11:30","Pending",30,1);
 		
 		service.bookAppointment(booking1);
 		service.bookAppointment(booking2);
@@ -106,7 +106,7 @@ class NotificationMockTest {
 	
 	@Test
 	void testNotificationCorrectContent() {
-		Booking booking = new Booking("fawzia","12:30","Pending",30,1);
+		Booking booking = new Booking("fawzia", "2026-05-03", "12:30","Pending",30,1);
 		service.bookAppointment(booking);
 		
 		List<String> messages = mockNotification.getSentMessages();

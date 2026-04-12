@@ -9,9 +9,15 @@ import java.util.List;
 
 public class AppointmentSlotServices extends AppointmentSlot{
 
-	public AppointmentSlotServices(String time, boolean isAvailable) {
-		super(time, isAvailable);
+	public AppointmentSlotServices(String date, String time, boolean isAvailable) {
+		super(date, time, isAvailable);
 	}
+
+	@Override
+	public String getDate() { return date; }
+
+	@Override
+	public void setDate(String date) { this.date = date; }
 
 	@Override
 	public boolean getAvailable() {
@@ -53,17 +59,18 @@ public class AppointmentSlotServices extends AppointmentSlot{
 		        String line;
 
 		        while ((line = reader.readLine()) != null) {
-		        	 if(line.startsWith("Time")) continue;
+		        	 if(line.startsWith("Time") || line.startsWith("Date")) continue;
 		        	 
 		            String[] parts = line.split(",");
 
-		            if (parts.length < 2) continue;  
+		            if (parts.length < 3) continue;  
 
-		            String time = parts[0].trim();
-		            boolean available = parts[1].trim().equalsIgnoreCase("Available");
+		            String date = parts[0].trim();
+		            String time = parts[1].trim();
+		            boolean available = parts[2].trim().equalsIgnoreCase("Available");
 
 		            if (available) {
-		                availableSlots.add(new AppointmentSlotServices(time,true ));
+		                availableSlots.add(new AppointmentSlotServices(date, time,true ));
 		                
 		            }
 		        }
