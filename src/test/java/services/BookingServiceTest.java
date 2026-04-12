@@ -5,6 +5,8 @@ import org.junit.jupiter.api.*;
 import java.io.*;
 import java.nio.file.*;
 import java.time.LocalTime;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -98,7 +100,7 @@ class BookingServiceTest {
 	        Booking booking = new Booking("testUser", "2026-05-03", "12:30", "Pending", 30, 1);
 	        service.bookAppointment(booking);
 	        
-	        String result = service.modifyBooking(booking, "2026-05-04", "13:00", LocalTime.of(8, 0));
+	        String result = service.modifyBooking(booking, "2026-05-04", "13:00", LocalDateTime.of(LocalDate.of(2026, 5, 2), LocalTime.of(8, 0)));
 	        assertEquals("Booking Success", result);
 	    }
 	    

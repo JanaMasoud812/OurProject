@@ -40,8 +40,8 @@ public class EmailService implements NotificationService {
             message.setSubject(subject);
             message.setText(body);
 
+
             Transport.send(message);
-            System.out.println("Email sent successfully to " + to);
 
         } catch (MessagingException e) {
             e.printStackTrace();

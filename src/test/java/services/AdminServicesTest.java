@@ -13,6 +13,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.time.LocalTime;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import services.BookingService;
 import services.MockNotificationService;
 
@@ -290,7 +293,7 @@ class AdminServicesTest {
 
 	    bookingService.bookAppointment(booking);
 
-	    String result = bookingService.modifyBooking(booking, "2026-05-04", "13:00", LocalTime.of(8, 0));
+	    String result = bookingService.modifyBooking(booking, "2026-05-04", "13:00", LocalDateTime.of(LocalDate.now(), LocalTime.of(8, 0)));
 
 	    assertTrue(result.contains("Cannot modify past"));
 	}

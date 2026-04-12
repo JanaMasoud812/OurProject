@@ -8,11 +8,12 @@ public class RuleFactory {
     public static List<BookingRuleStrategy> getRules(AppointmentType type) {
         List<BookingRuleStrategy> rules = new ArrayList<>();
 
-        if (type == null) return rules;
+        if (type == null)
+            return rules;
 
         switch (type) {
             case URGENT:
-                rules.add(new UrgentRule()); 
+                rules.add(new UrgentRule());
                 break;
             case FOLLOW_UP:
                 rules.add(new FollowUpRule());

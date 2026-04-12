@@ -4,6 +4,8 @@ package services;
 import models.*;
 
 import java.time.LocalTime;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import services.*;
 
@@ -20,6 +22,10 @@ public class AdminServices extends Admin {
         this.bookingService = new BookingService(new MockNotificationService());
         }
     //////
+    public void setBookingService(BookingService bookingService) {
+        this.bookingService = bookingService;
+    }
+    
     public BookingService getBookingService() {
         return  bookingService;
     }
@@ -224,7 +230,7 @@ public class AdminServices extends Admin {
     
     @Override
     public String modifyUserBooking(Booking booking, String newDate, String newTime) {
-    	return bookingService.modifyBooking(booking, newDate, newTime, LocalTime.of(9,0));
+    	return bookingService.modifyBooking(booking, newDate, newTime, LocalDateTime.of(LocalDate.now(), LocalTime.of(9,0)));
     	
     }
     
@@ -240,7 +246,7 @@ public class AdminServices extends Admin {
         if (role != 6) {
             throw new RuntimeException("Unauthorized: Only admins can modify bookings.");
         }
-        return bookingService.modifyBooking(oldBooking, newDate, newTime, LocalTime.of(9,0)); 
+        return bookingService.modifyBooking(oldBooking, newDate, newTime, LocalDateTime.of(LocalDate.now(), LocalTime.of(9,0))); 
     }
     
     
