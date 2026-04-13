@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 public class MainMenu {
     private static Dotenv dotenv = Dotenv.load();
@@ -155,9 +156,25 @@ public class MainMenu {
         }
     }
 
+    // =========================
+    // ONLY CHANGE IS HERE 👇
+    // =========================
+
+    private static boolean isValidEmail(String email) {
+        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+        return Pattern.compile(emailRegex).matcher(email).matches();
+    }
+
     private static void bookAppointment() {
         System.out.print("Enter Your Email/Username: ");
         String username = scanner.nextLine();
+
+        // ✅ EMAIL VALIDATION ADDED ONLY HERE
+        if (!isValidEmail(username)) {
+            System.out.println("Result: Booking Failed: Invalid Email Format");
+            return;
+        }
+
         System.out.print("Enter Date (yyyy-MM-dd): ");
         String date = scanner.nextLine();
         System.out.print("Enter Time (HH:mm): ");
@@ -186,7 +203,6 @@ public class MainMenu {
         System.out.print("Enter Current Time (HH:mm): ");
         String oldTime = scanner.nextLine();
 
-        // Future check
         if (!isFuture(oldDate, oldTime)) {
             System.out.println("Cannot modify past appointments.");
             return;

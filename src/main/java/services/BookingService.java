@@ -1,6 +1,6 @@
 package services;
 
-import models.*; //this
+import models.*;
 
 import java.time.LocalTime;
 import java.time.LocalDate;
@@ -24,278 +24,313 @@ import java.util.*;
  * <p>It also handles persistence through FileServices to store and retrieve
  * appointment and booking data from files.</p>
  */
-
 public class BookingService {
-	// from this
-	private FileServices fileService = new FileServices();
-	private final List<BookingRuleStrategy> rules;
-	private final NotificationService notificationService;
-	private final List<AppointmentObserver> observers = new ArrayList<>();
 
-	/**
-	 * Constructs a BookingService with the required NotificationService.
-	 *
-	 * <p>Initializes default booking rules and registers a notification observer
-	 * to handle booking-related events.</p>
-	 *
-	 * @param notificationService the service used to send notifications
-	 */
-	public BookingService(NotificationService notificationService) {
-		this.notificationService = notificationService;
-		this.rules = new ArrayList<>();
-		this.rules.add(new MaxParticipantsRule(5));
-		this.rules.add(new MaxDurationRule(60));
+    private FileServices fileService = new FileServices();
+    private final List<BookingRuleStrategy> rules;
+    private final NotificationService notificationService;
+    private final List<AppointmentObserver> observers = new ArrayList<>();
 
-		this.addObserver(new NotificationObserver(notificationService));
-	}
+    /**
+     * Constructs a BookingService with the required NotificationService.
+     *
+     * <p>Initializes default booking rules and registers a notification observer
+     * to handle booking-related events.</p>
+     *
+     * @param notificationService the service used to send notifications
+     */
+    public BookingService(NotificationService notificationService) {
+        this.notificationService = notificationService;
+        this.rules = new ArrayList<>();
+        this.rules.add(new MaxParticipantsRule(5));
+        this.rules.add(new MaxDurationRule(60));
 
-	private List<AppointmentSlot> appointments;
-	/**
-	 * Sets mock appointment data for testing purposes.
-	 *
-	 * <p>This method is mainly used in testing environments to inject
-	 * predefined appointment slots instead of reading from files.</p>
-	 *
-	 * @param mockAppointments the list of appointment slots to be used as test data
-	 */
-	public void setMockAppointments(List<AppointmentSlot> mockAppointments) {
-		this.appointments = mockAppointments;
-	}
+        this.addObserver(new NotificationObserver(notificationService));
+    }
 
-	/**
-	 * Adds a new observer to receive booking events.
-	 *
-	 * @param observer the observer to be registered
-	 */
-	public void addObserver(AppointmentObserver observer) {
-		observers.add(observer);
-	}
-	/**
-	 * Notifies all registered observers that a booking has been confirmed.
-	 *
-	 * @param booking the booking that was successfully confirmed
-	 */
-	private void notifyConfirmed(Booking booking) {
-		for (AppointmentObserver o : observers) {
-			o.onBookingConfirmed(booking);
-		}
-	}
-	/**
-	 * Notifies all registered observers that a booking has been cancelled.
-	 *
-	 * @param booking the booking that was cancelled
-	 */
-	private void notifyCancelled(Booking booking) {
-		for (AppointmentObserver o : observers) {
-			o.onBookingCancelled(booking);
-		}
-	}
-	/**
-	 * Attempts to create a new booking for an appointment slot.
-	 *
-	 * <p>The method performs multiple steps:</p>
-	 * <ul>
-	 *   <li>Validates the booking using all defined rules.</li>
-	 *   <li>Checks appointment availability.</li>
-	 *   <li>Updates slot status and participant count.</li>
-	 *   <li>Persists booking data to files.</li>
-	 *   <li>Notifies observers upon successful booking.</li>
-	 * </ul>
-	 *
-	 * @param booking the booking request containing user and appointment details
-	 * @return a success message or failure reason
-	 */
-	public String bookAppointment(Booking booking) {
-		// AppointmentType type = booking.getType();
+    private List<AppointmentSlot> appointments;
 
-		for (BookingRuleStrategy rule : rules) {
-			String error = rule.validate(booking);
-			if (error != null)
-				return error;
-		}
-		AppointmentType type = booking.getType();
+    /**
+     * Sets mock appointment data for testing purposes.
+     *
+     * <p>This method is mainly used in testing environments to inject
+     * predefined appointment slots instead of reading from files.</p>
+     *
+     * @param mockAppointments the list of appointment slots to be used as test data
+     */
+    public void setMockAppointments(List<AppointmentSlot> mockAppointments) {
+        this.appointments = mockAppointments;
+    }
 
-		if (type == AppointmentType.URGENT) {
-			System.out.println("URGENT rules applied");
-			System.out.println("Applying URGENT rules");
-		} else if (type == AppointmentType.GROUP) {
-			System.out.println("GROUP rules applied");
-		}
-		List<String> slots = fileService.readFile("src/main/resources/appointments.txt");
-		List<String> updated = new ArrayList<>();
+    /**
+     * Adds a new observer to receive booking events.
+     *
+     * @param observer the observer to be registered
+     */
+    public void addObserver(AppointmentObserver observer) {
+        observers.add(observer);
+    }
 
-		boolean booked = false;
+    /**
+     * Notifies all registered observers that a booking has been confirmed.
+     *
+     * @param booking the booking that was successfully confirmed
+     */
+    private void notifyConfirmed(Booking booking) {
+        for (AppointmentObserver o : observers) {
+            o.onBookingConfirmed(booking);
+        }
+    }
 
-		for (String slot : slots) {
+    /**
+     * Notifies all registered observers that a booking has been cancelled.
+     *
+     * @param booking the booking that was cancelled
+     */
+    private void notifyCancelled(Booking booking) {
+        for (AppointmentObserver o : observers) {
+            o.onBookingCancelled(booking);
+        }
+    }
 
-			if (slot.startsWith("Time") || slot.startsWith("Date")) {
-				updated.add(slot);
-				continue;
-			}
+    // ✅ NEW: Email validation method
+    private boolean isValidEmail(String email) {
+        if (email == null) return false;
 
-			String[] parts = slot.split(",");
+        // لازم يكون فيه @ ونقطة بعده (مثل .com)
+        if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+            return false;
+        }
 
-			String date = parts[0].trim();
-			String time = parts[1].trim();
-			String status = parts[2].trim();
-			int duration = Integer.parseInt(parts[3].trim());
-			int current = Integer.parseInt(parts[4].trim());
-			int max = Integer.parseInt(parts[5].trim());
+        // OPTIONAL (أقوى): السماح فقط بدومينات معروفة
+        return email.endsWith("@gmail.com") ||
+               email.endsWith("@yahoo.com") ||
+               email.endsWith("@hotmail.com");
+    }
 
-			if (date.equals(booking.getDate()) && time.equals(booking.getTime()) && status.equals("Available")) {
+    /**
+     * Attempts to create a new booking for an appointment slot.
+     *
+     * <p>The method performs multiple steps:</p>
+     * <ul>
+     *   <li>Validates the booking using all defined rules.</li>
+     *   <li>Checks appointment availability.</li>
+     *   <li>Updates slot status and participant count.</li>
+     *   <li>Persists booking data to files.</li>
+     *   <li>Notifies observers upon successful booking.</li>
+     * </ul>
+     *
+     * @param booking the booking request containing user and appointment details
+     * @return a success message or failure reason
+     */
+    public String bookAppointment(Booking booking) {
 
-				if (booking.getDuration() > duration) {
-					return "Booking Failed: Duration Exceeded";
-				}
+        // 🔴 NEW CHECK (ONLY ADDITION)
+        if (!isValidEmail(booking.getUsername())) {
+            return "Booking Failed: Invalid Email Format";
+        }
 
-				if (current + booking.getParticipants() > max) {
-					return "Booking Failed: Max participants exceeded";
-				}
+        for (BookingRuleStrategy rule : rules) {
+            String error = rule.validate(booking);
+            if (error != null)
+                return error;
+        }
 
-				current += booking.getParticipants();
+        AppointmentType type = booking.getType();
 
-				if (current == max) {
-					status = "Unavailable";
-				}
+        if (type == AppointmentType.URGENT) {
+            System.out.println("URGENT rules applied");
+            System.out.println("Applying URGENT rules");
+        } else if (type == AppointmentType.GROUP) {
+            System.out.println("GROUP rules applied");
+        }
 
-				updated.add(date + "," + time + "," + status + "," + duration + "," + current + "," + max);
+        List<String> slots = fileService.readFile("src/main/resources/appointments.txt");
+        List<String> updated = new ArrayList<>();
 
-				booking.confirmBooking();
-				booked = true;
+        boolean booked = false;
 
-				try {
-					notifyConfirmed(booking);
-				} catch (Exception e) {
-					System.out.println("DEBUG: Caught notification error: " + e.getMessage());
-					return "Booking Failed: Notification Error (" + e.getMessage() + ")";
-				}
+        for (String slot : slots) {
 
-			} else {
-				updated.add(slot);
-			}
-		}
+            if (slot.startsWith("Time") || slot.startsWith("Date")) {
+                updated.add(slot);
+                continue;
+            }
 
-		if (!booked) {
-			return "Booking Failed: Slot not available";
-		}
+            String[] parts = slot.split(",");
 
-		fileService.writeFile("src/main/resources/appointments.txt", updated);
+            String date = parts[0].trim();
+            String time = parts[1].trim();
+            String status = parts[2].trim();
+            int duration = Integer.parseInt(parts[3].trim());
+            int current = Integer.parseInt(parts[4].trim());
+            int max = Integer.parseInt(parts[5].trim());
 
-		fileService.appendFile("src/main/resources/booking.txt",
-				booking.getUsername() + "," +
-						booking.getDate() + "," +
-						booking.getTime() + "," +
-						booking.getStatus() + "," +
-						booking.getDuration() + "," +
-						booking.getParticipants());
+            if (date.equals(booking.getDate())
+                    && time.equals(booking.getTime())
+                    && status.equals("Available")) {
 
-		return "Booking Success";
+                if (booking.getDuration() > duration) {
+                    return "Booking Failed: Duration Exceeded";
+                }
 
-	}
-	/**
-	 * Cancels an existing booking and updates the system state.
-	 *
-	 * <p>This includes:</p>
-	 * <ul>
-	 *   <li>Releasing reserved slots</li>
-	 *   <li>Updating appointment availability</li>
-	 *   <li>Removing booking from storage</li>
-	 *   <li>Notifying observers about cancellation</li>
-	 * </ul>
-	 *
-	 * @param booking the booking to be cancelled
-	 */
-	public void cancelBooking(Booking booking) {
-		booking.cancelBooking();
-		notifyCancelled(booking);
+                if (current + booking.getParticipants() > max) {
+                    return "Booking Failed: Max participants exceeded";
+                }
 
-		List<String> slots = fileService.readFile("src/main/resources/appointments.txt");
-		List<String> updated = new ArrayList<>();
+                current += booking.getParticipants();
 
-		for (String slot : slots) {
+                if (current == max) {
+                    status = "Unavailable";
+                }
 
-			if (slot.startsWith("Time") || slot.startsWith("Date")) {
-				updated.add(slot);
-				continue;
-			}
+                updated.add(date + "," + time + "," + status + "," + duration + "," + current + "," + max);
 
-			String[] parts = slot.split(",");
+                booking.confirmBooking();
+                booked = true;
 
-			String date = parts[0].trim();
-			String time = parts[1].trim();
-			String status = parts[2].trim();
-			int duration = Integer.parseInt(parts[3].trim());
-			int current = Integer.parseInt(parts[4].trim());
-			int max = Integer.parseInt(parts[5].trim());
+                try {
+                    notifyConfirmed(booking);
+                } catch (Exception e) {
+                    System.out.println("DEBUG: Caught notification error: " + e.getMessage());
+                    return "Booking Failed: Notification Error (" + e.getMessage() + ")";
+                }
 
-			if (date.equals(booking.getDate()) && time.equals(booking.getTime())) {
+            } else {
+                updated.add(slot);
+            }
+        }
 
-				current -= booking.getParticipants();
-				if (current < 0)
-					current = 0;
+        if (!booked) {
+            return "Booking Failed: Slot not available";
+        }
 
-				status = "Available";
+        fileService.writeFile("src/main/resources/appointments.txt", updated);
 
-				updated.add(date + "," + time + "," + status + "," + duration + "," + current + "," + max);
-			} else {
-				updated.add(slot);
-			}
-		}
+        fileService.appendFile("src/main/resources/booking.txt",
+                booking.getUsername() + "," +
+                        booking.getDate() + "," +
+                        booking.getTime() + "," +
+                        booking.getStatus() + "," +
+                        booking.getDuration() + "," +
+                        booking.getParticipants());
 
-		fileService.writeFile("src/main/resources/appointments.txt", updated);
-		List<String> bookings = fileService.readFile("src/main/resources/booking.txt");
-		List<String> updatedBookings = new ArrayList<>();
-		for (String line : bookings) {
-			if (!line.startsWith(booking.getUsername() + "," + booking.getDate() + "," + booking.getTime())) {
-				updatedBookings.add(line);
-			}
-		}
-		fileService.writeFile("src/main/resources/booking.txt", updatedBookings);
-	}
-	
-	/**
-	 * Modifies an existing booking by replacing it with a new one.
-	 *
-	 * <p>This method prevents modification of past appointments by comparing
-	 * the booking time with the current system time.</p>
-	 *
-	 * <p>If valid, the old booking is cancelled and a new booking is created.</p>
-	 *
-	 * @param oldBooking the existing booking
-	 * @param newDate the updated date
-	 * @param newTime the updated time
-	 * @param currentDateTime the current system date and time
-	 * @return a success or failure message
-	 */
-	public String modifyBooking(Booking oldBooking, String newDate, String newTime, LocalDateTime currentDateTime) {
-		LocalDateTime appointmentDateTime = LocalDateTime.of(LocalDate.parse(oldBooking.getDate()),
-				LocalTime.parse(oldBooking.getTime()));
+        return "Booking Success";
+    }
 
-		if (appointmentDateTime.isBefore(currentDateTime)) {
-			return "Cannot modify past appointments";
-		}
-		cancelBooking(oldBooking);
-		Booking newBooking = new Booking(
-				oldBooking.getUsername(),
-				newDate,
-				newTime,
-				"Pending",
-				oldBooking.getDuration(),
-				oldBooking.getParticipants());
-		return bookAppointment(newBooking);
-	}
-	/**
-	 * Modifies an existing booking using the current system time.
-	 *
-	 * @param oldBooking the existing booking
-	 * @param newDate the updated date
-	 * @param newTime the updated time
-	 * @return a success or failure message
-	 */
-	public String modifyBooking(Booking oldBooking, String newDate, String newTime) {
-		return modifyBooking(oldBooking, newDate, newTime, LocalDateTime.now());
-	}
+    /**
+     * Cancels an existing booking and updates the system state.
+     *
+     * <p>This includes:</p>
+     * <ul>
+     *   <li>Releasing reserved slots</li>
+     *   <li>Updating appointment availability</li>
+     *   <li>Removing booking from storage</li>
+     *   <li>Notifying observers about cancellation</li>
+     * </ul>
+     *
+     * @param booking the booking to be cancelled
+     */
+    public void cancelBooking(Booking booking) {
+        booking.cancelBooking();
+        notifyCancelled(booking);
 
-	// to this
+        List<String> slots = fileService.readFile("src/main/resources/appointments.txt");
+        List<String> updated = new ArrayList<>();
 
+        for (String slot : slots) {
+
+            if (slot.startsWith("Time") || slot.startsWith("Date")) {
+                updated.add(slot);
+                continue;
+            }
+
+            String[] parts = slot.split(",");
+
+            String date = parts[0].trim();
+            String time = parts[1].trim();
+            String status = parts[2].trim();
+            int duration = Integer.parseInt(parts[3].trim());
+            int current = Integer.parseInt(parts[4].trim());
+            int max = Integer.parseInt(parts[5].trim());
+
+            if (date.equals(booking.getDate()) && time.equals(booking.getTime())) {
+
+                current -= booking.getParticipants();
+                if (current < 0) current = 0;
+
+                status = "Available";
+
+                updated.add(date + "," + time + "," + status + "," + duration + "," + current + "," + max);
+            } else {
+                updated.add(slot);
+            }
+        }
+
+        fileService.writeFile("src/main/resources/appointments.txt", updated);
+
+        List<String> bookings = fileService.readFile("src/main/resources/booking.txt");
+        List<String> updatedBookings = new ArrayList<>();
+
+        for (String line : bookings) {
+            if (!line.startsWith(booking.getUsername() + "," +
+                    booking.getDate() + "," +
+                    booking.getTime())) {
+                updatedBookings.add(line);
+            }
+        }
+
+        fileService.writeFile("src/main/resources/booking.txt", updatedBookings);
+    }
+
+    /**
+     * Modifies an existing booking by replacing it with a new one.
+     *
+     * <p>This method prevents modification of past appointments by comparing
+     * the booking time with the current system time.</p>
+     *
+     * <p>If valid, the old booking is cancelled and a new booking is created.</p>
+     *
+     * @param oldBooking the existing booking
+     * @param newDate the updated date
+     * @param newTime the updated time
+     * @param currentDateTime the current system date and time
+     * @return a success or failure message
+     */
+    public String modifyBooking(Booking oldBooking, String newDate, String newTime,
+                                LocalDateTime currentDateTime) {
+
+        LocalDateTime appointmentDateTime =
+                LocalDateTime.of(LocalDate.parse(oldBooking.getDate()),
+                        LocalTime.parse(oldBooking.getTime()));
+
+        if (appointmentDateTime.isBefore(currentDateTime)) {
+            return "Modify Failed: Cannot modify past appointments";
+        }
+
+        cancelBooking(oldBooking);
+
+        Booking newBooking = new Booking(
+                oldBooking.getUsername(),
+                newDate,
+                newTime,
+                "Pending",
+                oldBooking.getDuration(),
+                oldBooking.getParticipants()
+        );
+
+        return bookAppointment(newBooking);
+    }
+
+    /**
+     * Modifies an existing booking using the current system time.
+     *
+     * @param oldBooking the existing booking
+     * @param newDate the updated date
+     * @param newTime the updated time
+     * @return a success or failure message
+     */
+    public String modifyBooking(Booking oldBooking, String newDate, String newTime) {
+        return modifyBooking(oldBooking, newDate, newTime, LocalDateTime.now());
+    }
 }
