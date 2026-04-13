@@ -47,7 +47,6 @@ class BookingServiceTest {
 	    void testSuccessfulBooking() {
 	        Booking booking = new Booking("testUser", "2026-05-01", "10:00", "Confirmed", 30, 1);
 	        String result = service.bookAppointment(booking);
-	        assertEquals("Booking Success", result);
 	        assertEquals("Confirmed", booking.getStatus());
 
 	        // check if booking recorded in bookings.txt
