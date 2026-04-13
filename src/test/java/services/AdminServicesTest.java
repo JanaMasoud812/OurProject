@@ -52,15 +52,7 @@ class AdminServicesTest {
 	private String appointmentsBackup;
 	private String bookingsBackup;
 
-	//@Test
-	//void test() {
-		//fail("Not yet implemented");
-	//}
-
 	
-
-	
-	//login
 
 	@Test
 	void testLoginSuccess() {
@@ -268,22 +260,6 @@ class AdminServicesTest {
 	}
 	
 
-/*
-	@Test
-	void testAdminModifyUserBooking() {
-	    BookingService bookingService = new BookingService(new MockNotificationService());
-	    Booking booking = new Booking("testUser", "2026-05-03", "12:30", "Pending", 30, 1);
-	    bookingService.bookAppointment(booking);
-
-	    AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
-	    String result = admin.modifyUserBooking(booking, "2026-05-04", "13:00");
-	    assertEquals("Booking Success", result);
-	}
-	
-	*/
-	
-	 
-	
 	
 	
 	@Test

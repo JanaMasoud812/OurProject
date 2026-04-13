@@ -156,9 +156,7 @@ public class MainMenu {
         }
     }
 
-    // =========================
-    // ONLY CHANGE IS HERE 👇
-    // =========================
+   
 
     private static boolean isValidEmail(String email) {
         String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
@@ -169,7 +167,7 @@ public class MainMenu {
         System.out.print("Enter Your Email/Username: ");
         String username = scanner.nextLine();
 
-        // ✅ EMAIL VALIDATION ADDED ONLY HERE
+      
         if (!isValidEmail(username)) {
             System.out.println("Result: Booking Failed: Invalid Email Format");
             return;

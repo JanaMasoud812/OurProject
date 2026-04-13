@@ -32,14 +32,12 @@ class BookingServiceTest {
 	 @BeforeEach
 	    void setUp() throws IOException {
 		    service = new BookingService(new MockNotificationService());
-	        // backup files content
 	        appointmentsBackup = Files.readString(appointmentsPath);
 	        bookingsBackup = Files.readString(bookingsPath);
 	    }
 
 	    @AfterEach
 	    void tearDown() throws IOException {
-	        // restore files content
 	        Files.writeString(appointmentsPath, appointmentsBackup);
 	        Files.writeString(bookingsPath, bookingsBackup);
 	    }

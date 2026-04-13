@@ -124,7 +124,6 @@ public class BookingService {
      */
     public String bookAppointment(Booking booking) {
 
-        // 🔴 NEW CHECK (ONLY ADDITION)
         if (!isValidEmail(booking.getUsername())) {
             return "Booking Failed: Invalid Email Format";
         }
