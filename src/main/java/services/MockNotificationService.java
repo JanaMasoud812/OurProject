@@ -12,7 +12,7 @@ public class MockNotificationService implements NotificationService {
 
 	        String notification = username + " - " + message;
 
-	        sentMessages.add(notification);   // تخزين الرسالة
+	        sentMessages.add(notification);  
 
 	        System.out.println("Mock notification sent: " + notification);
 	    }

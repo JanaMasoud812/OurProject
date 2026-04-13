@@ -82,7 +82,7 @@ class BookingServiceTest {
 
 	    @Test
 	    void testCancelBooking() throws IOException {
-	        Booking booking = new Booking("testUser", "2026-05-01", "10:00", "Confirmed", 30, 1);
+	        Booking booking = new Booking("test@gmail.com", "2026-05-01", "10:00", "Confirmed", 30, 1);
 	        service.bookAppointment(booking);
 
 	        service.cancelBooking(booking);

@@ -93,7 +93,6 @@ public class BookingService {
         }
     }
 
-    // ✅ NEW: Email validation method
     private boolean isValidEmail(String email) {
         if (email == null) return false;
 

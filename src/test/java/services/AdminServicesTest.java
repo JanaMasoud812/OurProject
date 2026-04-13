@@ -258,7 +258,7 @@ class AdminServicesTest {
 	@Test
 	void testAdminCancelUserBooking() {
 	    BookingService bookingService = new BookingService(new MockNotificationService());
-	    Booking booking = new Booking("testUser", "2026-05-03", "12:30", "Pending", 30, 1);
+	    Booking booking = new Booking("test@gmail.com", "2026-05-03", "12:30", "Pending", 30, 1);
 	    bookingService.bookAppointment(booking);
 
 	    AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
@@ -339,7 +339,7 @@ class AdminServicesTest {
     @Test
     void testAdminModifyBooking_Unauthorized() {
         AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
-        Booking booking = new Booking("fawzia@gmail.com", "2026-05-01", "22:00", "Pending", 30, 1);
+        Booking booking = new Booking("fawzia@gmail.com", "2026-05-01", "10:00", "Pending", 30, 1);
 
         admin.getBookingService().bookAppointment(booking);
 
