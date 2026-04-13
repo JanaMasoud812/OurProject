@@ -97,12 +97,12 @@ public class BookingService {
     private boolean isValidEmail(String email) {
         if (email == null) return false;
 
-        // لازم يكون فيه @ ونقطة بعده (مثل .com)
+        
         if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
             return false;
         }
 
-        // OPTIONAL (أقوى): السماح فقط بدومينات معروفة
+        
         return email.endsWith("@gmail.com") ||
                email.endsWith("@yahoo.com") ||
                email.endsWith("@hotmail.com");

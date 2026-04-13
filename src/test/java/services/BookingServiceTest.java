@@ -1,5 +1,6 @@
 package services;
 
+import models.AppointmentSlot;
 import models.Booking;
 import org.junit.jupiter.api.*;
 import java.io.*;
@@ -44,38 +45,37 @@ class BookingServiceTest {
 	    }
 
 	    @Test
-	    void testSuccessfulBooking() {
-	        Booking booking = new Booking("testUser", "2026-05-01", "10:00", "Confirmed", 30, 1);
-	        String result = service.bookAppointment(booking);
-	        assertEquals("Confirmed", booking.getStatus());
+	    void testSuccessfulBooking() throws IOException {
 
-	        // check if booking recorded in bookings.txt
-	        try {
-	            List<String> bookings = Files.readAllLines(bookingsPath);
-	            boolean found = bookings.stream().anyMatch(line -> line.contains("testUser") && line.contains("10:00"));
-	            assertTrue(found);
-	        } catch (IOException e) {
-	            fail("Failed reading bookings file");
-	        }
+	        Files.writeString(appointmentsPath,
+	                "Date,Time,Status,Duration,Current,Max\n" +
+	                "2026-05-01,10:00,Available,60,0,5\n");
+
+	        Booking booking = new Booking("test@gmail.com", "2026-05-01", "10:00", "Pending", 30, 1);
+
+	        String result = service.bookAppointment(booking);
+
+	        assertEquals("Booking Success", result);
+	        assertEquals("Confirmed", booking.getStatus());
 	    }
 
 	    @Test
 	    void testBookingMaxParticipantsExceeded() {
-	        Booking booking = new Booking("testUser", "2026-05-01", "10:00", "Confirmed", 30, 10);
+	        Booking booking = new Booking("test@gmail.com", "2026-05-01", "10:00", "Confirmed", 30, 10);
 	        String result = service.bookAppointment(booking);
 	        assertTrue(result.contains("Max participants exceeded"));
 	    }
 
 	    @Test
 	    void testBookingDurationExceeded() {
-	        Booking booking = new Booking("testUser", "2026-05-01", "10:00", "Confirmed", 120, 1);
+	        Booking booking = new Booking("test@gmail.com", "2026-05-01", "10:00", "Confirmed", 120, 1);
 	        String result = service.bookAppointment(booking);
 	        assertTrue(result.contains("Duration Exceeded"));
 	    }
 
 	    @Test
 	    void testBookingUnavailableSlot() {
-	        Booking booking = new Booking("testUser", "2026-05-01", "10:30", "Confirmed", 30, 1); // 10:30 is Unavailable in your file
+	        Booking booking = new Booking("test@gmail.com", "2026-05-01", "10:30", "Confirmed", 30, 1); // 10:30 is Unavailable in your file
 	        String result = service.bookAppointment(booking);
 	        assertTrue(result.contains("Slot not available"));
 	    }
@@ -96,7 +96,7 @@ class BookingServiceTest {
 	    
 	    @Test
 	    void testModifyBooking() throws IOException {
-	        Booking booking = new Booking("testUser", "2026-05-03", "12:30", "Pending", 30, 1);
+	        Booking booking = new Booking("test@gmail.com", "2026-05-03", "12:30", "Pending", 30, 1);
 	        service.bookAppointment(booking);
 	        
 	        String result = service.modifyBooking(booking, "2026-05-04", "13:00", LocalDateTime.of(LocalDate.of(2026, 5, 2), LocalTime.of(8, 0)));

@@ -301,7 +301,7 @@ class AdminServicesTest {
 	@Test
 	void testAdminModifyUserBooking() {
 	    AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
-	    Booking booking = new Booking("testUser", "2026-05-02", "11:30", "Pending", 30, 1);
+	    Booking booking = new Booking("testUser@gmail.com", "2026-05-02", "11:30", "Pending", 30, 1);
 
 	    admin.getBookingService().bookAppointment(booking);
 

@@ -39,12 +39,12 @@ class NotificationMockTest {
 	
 	@Test
 	void testSuccessfulBooking() {
-		Booking booking = new Booking("fawzia@example.com", "2026-05-01", "10:00", "Pending",30,1);
+		Booking booking = new Booking("fawzia@gmail.com", "2026-05-01", "10:00", "Pending",30,1);
 		service.bookAppointment(booking);
 		
 		List<String>messages=mockNotification.getSentMessages();
 		assertEquals(1, messages.size());
-        assertTrue(messages.get(0).contains("fawzia@example.com"));
+        assertTrue(messages.get(0).contains("fawzia@gmail.com"));
         assertTrue(messages.get(0).contains("10:00"));
         assertTrue(messages.get(0).toLowerCase().contains("confirmed"));
 		
@@ -54,7 +54,7 @@ class NotificationMockTest {
 	
 	@Test
 	void testUnavailableSlot() {
-		Booking booking = new Booking("user1@example.com", "2026-05-01", "10:30","Pending",30,1);
+		Booking booking = new Booking("user1@gmail.com", "2026-05-01", "10:30","Pending",30,1);
 		service.bookAppointment(booking);
 		List<String>messages=mockNotification.getSentMessages();
 		assertEquals(0, messages.size());
@@ -65,7 +65,7 @@ class NotificationMockTest {
 	
 	@Test
 	void testForMaxParticipation() {
-		Booking booking = new Booking("user2@example.com", "2026-05-01", "10:30","Pending",30,10);
+		Booking booking = new Booking("user2@gmail.com", "2026-05-01", "10:30","Pending",30,10);
 		service.bookAppointment(booking);
 		
 		List<String> messages = mockNotification.getSentMessages();
@@ -77,7 +77,7 @@ class NotificationMockTest {
 	
 	@Test
 	void testForDuration() {
-		Booking booking = new Booking("user3@example.com", "2026-05-01", "10:00","Pending",120,1);
+		Booking booking = new Booking("user3@gmail.com", "2026-05-01", "10:00","Pending",120,1);
 		service.bookAppointment(booking);
 		
 		List<String> messages = mockNotification.getSentMessages();
@@ -90,30 +90,30 @@ class NotificationMockTest {
 	
 	@Test 
 	void testMultipleNOtificationForMultipleBookings() {
-		Booking booking1= new Booking("user1@example.com", "2026-05-07", "14:00","Pending",30,1);
-		Booking booking2 = new Booking("user2@example.com", "2026-05-04", "13:00","Pending",30,1);
+		Booking booking1= new Booking("user1@gmail.com", "2026-05-07", "14:00","Pending",30,1);
+		Booking booking2 = new Booking("user2@gmail.com", "2026-05-04", "13:00","Pending",30,1);
 		
 		service.bookAppointment(booking1);
 		service.bookAppointment(booking2);
 		
 		List<String> messages = mockNotification.getSentMessages();
 		assertEquals(2,messages.size());
-		assertTrue(messages.get(0).contains("user1@example.com"));
-		assertTrue(messages.get(1).contains("user2@example.com"));
+		assertTrue(messages.get(0).contains("user1@gmail.com"));
+		assertTrue(messages.get(1).contains("user2@gmail.com"));
 
 	}
 	
 	
 	@Test
 	void testNotificationCorrectContent() {
-		Booking booking = new Booking("fawzia@example.com", "2026-05-07", "14:00","Pending",30,1);
+		Booking booking = new Booking("fawzia@gmail.com", "2026-05-07", "14:00","Pending",30,1);
 		service.bookAppointment(booking);
 		
 		List<String> messages = mockNotification.getSentMessages();
 		assertEquals(1,messages.size());
 		
 		String msg= messages.get(0);
-		assertTrue(msg.contains("fawzia@example.com"));
+		assertTrue(msg.contains("fawzia@gmail.com"));
 		assertTrue(msg.contains("14:00"));
 		assertTrue(msg.toLowerCase().contains("confirmed"));
 		

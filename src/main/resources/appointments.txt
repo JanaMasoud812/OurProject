@@ -4,5 +4,5 @@ Date,Time,Status,Duration,CurrentParticipants,MaxParticipants
 2026-05-02,11:00,Unavailable,30,5,5
 2026-05-02,11:30,Unavailable,30,5,5
 2026-05-03,12:30,Unavailable,30,5,5
-2026-05-04,13:00,Available,30,3,5
+2026-05-04,13:00,Available,30,4,5
 2026-05-07,14:00,Available,30,1,5
