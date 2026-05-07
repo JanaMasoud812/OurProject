@@ -5,6 +5,10 @@
   <version>0.0.1-SNAPSHOT</version>
   <name>AppointmentsSystem</name>
   
+  <properties>
+  <sonar.organization>appointmentnajah2026</sonar.organization>
+</properties>
+
   
    <dependencies>
 
