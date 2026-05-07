@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
-public class MainMenu {
+public class MainMenu { 
     private static Dotenv dotenv = Dotenv.load();
     private static String emailUsername = dotenv.get("EMAIL_USERNAME");
     private static String emailPassword = dotenv.get("EMAIL_PASSWORD");
@@ -257,4 +257,5 @@ public class MainMenu {
         }
         return false;
     }
+    
 }

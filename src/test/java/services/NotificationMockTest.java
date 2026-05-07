@@ -88,7 +88,7 @@ class NotificationMockTest {
 	}
 	
 	
-	@Test 
+	/*@Test 
 	void testMultipleNOtificationForMultipleBookings() {
 		Booking booking1= new Booking("user1@gmail.com", "2026-05-07", "14:00","Pending",30,1);
 		Booking booking2 = new Booking("user2@gmail.com", "2026-05-04", "13:00","Pending",30,1);
@@ -101,10 +101,62 @@ class NotificationMockTest {
 		assertTrue(messages.get(0).contains("user1@gmail.com"));
 		assertTrue(messages.get(1).contains("user2@gmail.com"));
 
+	}*/
+	
+	@Test
+	void testMultipleNOtificationForMultipleBookings() {
+
+	    List<AppointmentSlot> mockSlots = new ArrayList<>();
+
+	    mockSlots.add(
+	            new AppointmentSlotServices(
+	                    "2026-05-07",
+	                    "14:00",
+	                    true
+	            )
+	    );
+
+	    mockSlots.add(
+	            new AppointmentSlotServices(
+	                    "2026-05-04",
+	                    "13:00",
+	                    true
+	            )
+	    );
+
+	    service.setMockAppointments(mockSlots);
+
+	    Booking booking1 = new Booking(
+	            "user1@gmail.com",
+	            "2026-05-07",
+	            "14:00",
+	            "Pending",
+	            30,
+	            1
+	    );
+
+	    Booking booking2 = new Booking(
+	            "user2@gmail.com",
+	            "2026-05-04",
+	            "13:00",
+	            "Pending",
+	            30,
+	            1
+	    );
+
+	    service.bookAppointment(booking1);
+	    service.bookAppointment(booking2);
+
+	    List<String> messages = mockNotification.getSentMessages();
+
+	    assertEquals(2, messages.size());
+
+	    assertTrue(messages.get(0).contains("user1@gmail.com"));
+	    assertTrue(messages.get(1).contains("user2@gmail.com"));
 	}
 	
 	
-	@Test
+	/*@Test
 	void testNotificationCorrectContent() {
 		Booking booking = new Booking("fawzia@gmail.com", "2026-05-07", "14:00","Pending",30,1);
 		service.bookAppointment(booking);
@@ -119,6 +171,42 @@ class NotificationMockTest {
 		
 		
 		
+	}*/
+	@Test
+	void testNotificationCorrectContent() {
+
+	    List<AppointmentSlot> mockSlots = new ArrayList<>();
+
+	    mockSlots.add(
+	            new AppointmentSlotServices(
+	                    "2026-05-07",
+	                    "14:00",
+	                    true
+	            )
+	    );
+
+	    service.setMockAppointments(mockSlots);
+
+	    Booking booking = new Booking(
+	            "fawzia@gmail.com",
+	            "2026-05-07",
+	            "14:00",
+	            "Pending",
+	            30,
+	            1
+	    );
+
+	    service.bookAppointment(booking);
+
+	    List<String> messages = mockNotification.getSentMessages();
+
+	    assertEquals(1, messages.size());
+
+	    String msg = messages.get(0);
+
+	    assertTrue(msg.contains("fawzia@gmail.com"));
+	    assertTrue(msg.contains("14:00"));
+	    assertTrue(msg.toLowerCase().contains("confirmed"));
 	}
 	
 	

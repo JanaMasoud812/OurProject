@@ -143,7 +143,28 @@ public class BookingService {
             System.out.println("GROUP rules applied");
         }
 
-        List<String> slots = fileService.readFile("src/main/resources/appointments.txt");
+        List<String> slots;
+
+        if (appointments != null) {
+
+            slots = new ArrayList<>();
+
+            for (AppointmentSlot slot : appointments) {
+
+                String status = slot.getAvailable() ? "Available" : "Unavailable";
+
+                slots.add(
+                        slot.getDate() + "," +
+                        slot.getTime() + "," +
+                        status + ",60,0,5"
+                );
+            }
+
+        } else {
+
+            slots = fileService.readFile("src/main/resources/appointments.txt");
+
+        }      
         List<String> updated = new ArrayList<>();
 
         boolean booked = false;

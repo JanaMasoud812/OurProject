@@ -3,7 +3,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 import models.Booking;
 
 public class TestNotification {
-    public static void main(String[] args) {
+  /*  public static void main(String[] args) {
         Dotenv dotenv = Dotenv.load();
         String emailUsername = dotenv.get("EMAIL_USERNAME");
         String emailPassword = dotenv.get("EMAIL_PASSWORD");
@@ -30,5 +30,5 @@ public class TestNotification {
         
        // bookingService.cancelBooking(booking);
        // System.out.println("Booking cancelled.");
-    }
+    }*/
 }

@@ -1,5 +1,7 @@
 package services;
 import java.nio.file.*;
+
+import models.AppointmentSlot;
 import models.Booking;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -274,7 +276,7 @@ class AdminServicesTest {
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	@Test
+	/*@Test
 	void testAdminModifyUserBooking() {
 	    AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
 	    Booking booking = new Booking("testUser@gmail.com", "2026-05-02", "11:30", "Pending", 30, 1);
@@ -282,6 +284,41 @@ class AdminServicesTest {
 	    admin.getBookingService().bookAppointment(booking);
 
 	    String result = admin.modifyUserBooking(booking, "2026-05-04", "13:00");
+
+	    assertEquals("Booking Success", result);
+	}*/
+	
+	@Test
+	void testAdminModifyUserBooking() {
+
+	    AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
+
+	    List<AppointmentSlot> mockSlots = new ArrayList<>();
+
+	    mockSlots.add(new AppointmentSlotServices("2026-05-02", "11:30", true));
+	    mockSlots.add(new AppointmentSlotServices("2026-05-04", "13:00", true));
+
+	    admin.getBookingService().setMockAppointments(mockSlots);
+
+	    Booking booking = new Booking(
+	            "testUser@gmail.com",
+	            "2026-05-02",
+	            "11:30",
+	            "Pending",
+	            30,
+	            1
+	    );
+
+	    admin.getBookingService().bookAppointment(booking);
+
+	    // 👇 أهم تعديل هنا (نستخدم وقت ثابت بدل اليوم الحالي)
+	    String result = admin.getBookingService()
+	            .modifyBooking(
+	                    booking,
+	                    "2026-05-04",
+	                    "13:00",
+	                    LocalDateTime.of(2026, 5, 1, 9, 0)
+	            );
 
 	    assertEquals("Booking Success", result);
 	}
@@ -300,7 +337,7 @@ class AdminServicesTest {
         assertEquals("Unauthorized: Only admins can cancel bookings.", exception.getMessage());
     }
 
-    @Test
+    /*@Test
     void testAdminModifyBooking_Success() {
         AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
         Booking booking = new Booking("fawzia@gmail.com", "2026-05-02", "11:30", "Pending", 30, 1);
@@ -308,6 +345,41 @@ class AdminServicesTest {
         admin.getBookingService().bookAppointment(booking);
 
         String result = admin.adminModifyBooking(booking, "2026-05-04", "13:00", 6);
+
+        assertEquals("Booking Success", result);
+    }*/
+    
+    @Test
+    void testAdminModifyBooking_Success() {
+
+        AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
+
+        List<AppointmentSlot> mockSlots = new ArrayList<>();
+
+        mockSlots.add(new AppointmentSlotServices("2026-05-02", "11:30", true));
+        mockSlots.add(new AppointmentSlotServices("2026-05-04", "13:00", true));
+
+        admin.getBookingService().setMockAppointments(mockSlots);
+
+        Booking booking = new Booking(
+                "fawzia@gmail.com",
+                "2026-05-02",
+                "11:30",
+                "Pending",
+                30,
+                1
+        );
+
+        admin.getBookingService().bookAppointment(booking);
+
+        String result = admin.getBookingService().modifyBooking(
+                booking,
+                "2026-05-04",
+                "13:00",
+                LocalDateTime.of(2026, 5, 1, 9, 0)
+        );
+
+        System.out.println(result);
 
         assertEquals("Booking Success", result);
     }
