@@ -16,6 +16,7 @@ public class MainMenu {
     private static String emailUsername = dotenv.get("EMAIL_USERNAME");
     private static String emailPassword = dotenv.get("EMAIL_PASSWORD");
     private static final String CHOICE = "Choice: ";
+    private static final String ENTER_DATE = "Enter Date (yyyy-MM-dd): ";
     private static EmailService emailService = new EmailService(emailUsername, emailPassword);
     private static AdminServices adminService = new AdminServices("", "", "", 0);
     private static BookingService bookingService = new BookingService(emailService);
@@ -82,8 +83,7 @@ public class MainMenu {
                         adminService.viewSlots();
                         break;
                     case "2":
-                        System.out.print("Enter Date (yyyy-MM-dd): ");
-                        String d = scanner.nextLine();
+                    	System.out.print(ENTER_DATE);                        String d = scanner.nextLine();
                         System.out.print("Enter Time (HH:mm): ");
                         String t = scanner.nextLine();
                         System.out.print("Enter New Status (Available/Unavailable): ");
@@ -92,7 +92,7 @@ public class MainMenu {
                         System.out.println("Status updated.");
                         break;
                     case "3":
-                        System.out.print("Enter Date (yyyy-MM-dd): ");
+                    	System.out.print(ENTER_DATE);
                         d = scanner.nextLine();
                         System.out.print("Enter Time (HH:mm): ");
                         t = scanner.nextLine();
@@ -100,7 +100,7 @@ public class MainMenu {
                         System.out.println("Slot removed.");
                         break;
                     case "4":
-                        System.out.print("Enter Date (yyyy-MM-dd): ");
+                    	System.out.print(ENTER_DATE);
                         d = scanner.nextLine();
                         System.out.print("Enter Time (HH:mm): ");
                         t = scanner.nextLine();
@@ -180,7 +180,7 @@ public class MainMenu {
             return;
         }
 
-        System.out.print("Enter Date (yyyy-MM-dd): ");
+        System.out.print(ENTER_DATE);
         String date = scanner.nextLine();
         System.out.print("Enter Time (HH:mm): ");
         String time = scanner.nextLine();
@@ -226,7 +226,7 @@ public class MainMenu {
     private static void cancelAppointment() {
         System.out.print("Enter Your Email/Username: ");
         String username = scanner.nextLine();
-        System.out.print("Enter Date (yyyy-MM-dd): ");
+        System.out.print(ENTER_DATE);
         String date = scanner.nextLine();
         System.out.print("Enter Time (HH:mm): ");
         String time = scanner.nextLine();
