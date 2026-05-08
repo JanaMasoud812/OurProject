@@ -231,7 +231,7 @@ public class BookingService {
         booking.cancelBooking();
         notifyCancelled(booking);
 
-        List<String> slots = fileService.readFile("src/main/resources/appointments.txt");
+        List<String> slots = loadSlots();
         List<String> updated = new ArrayList<>();
 
         for (String slot : slots) {

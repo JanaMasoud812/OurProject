@@ -155,7 +155,7 @@ public class AdminServices extends Admin {
 
         for (String line : admins) {
             String[] parts = line.split(",");
-
+            if (parts.length < 4) continue;
             if (parts[0].equals(this.username)) {
                 updated.add(parts[0] + "," + password + "," + parts[2] + "," + parts[3]);
             } else {
