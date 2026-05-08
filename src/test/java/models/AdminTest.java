@@ -16,18 +16,22 @@ class AdminTest {
 
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
+		// No global setup required for this test class
 	}
 
 	@AfterAll
 	static void tearDownAfterClass() throws Exception {
+		 // No global teardown required for this test class
 	}
 
 	@BeforeEach
 	void setUp() throws Exception {
+		 // No setup required before each test
 	}
 
 	@AfterEach
 	void tearDown() throws Exception {
+		 // No cleanup required after each test
 	}
 
 
