@@ -5,10 +5,13 @@
   <version>0.0.1-SNAPSHOT</version>
   <name>AppointmentsSystem</name>
   
-  <properties>
-  <sonar.organization>appointmentnajah2026</sonar.organization>
+
+    <properties>
+    <sonar.organization>appointmentnajah2026</sonar.organization>
+    <sonar.projectKey>AppointmentNajah2026_OurProject</sonar.projectKey>
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
 </properties>
+
 
   
    <dependencies>
