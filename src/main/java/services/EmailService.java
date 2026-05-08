@@ -4,8 +4,12 @@ import jakarta.mail.*;
 import jakarta.mail.internet.*;
 import java.util.Properties;
 import io.github.cdimascio.dotenv.Dotenv;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class EmailService implements NotificationService {
+
+    private static final Logger LOGGER = Logger.getLogger(EmailService.class.getName());
 
     private final String username;
     private final String password;
@@ -21,6 +25,7 @@ public class EmailService implements NotificationService {
     }
 
     public void sendEmail(String to, String subject, String body) {
+
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
@@ -29,7 +34,10 @@ public class EmailService implements NotificationService {
 
         Session session = Session.getInstance(props, new Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(EmailService.this.username, EmailService.this.password);
+                return new PasswordAuthentication(
+                        EmailService.this.username,
+                        EmailService.this.password
+                );
             }
         });
 
@@ -40,22 +48,28 @@ public class EmailService implements NotificationService {
             message.setSubject(subject);
             message.setText(body);
 
-
             Transport.send(message);
 
         } catch (MessagingException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to send email", e);
+
+            // ❌ بدل printStackTrace
+            LOGGER.log(Level.SEVERE, "Failed to send email", e);
+
+            throw new RuntimeException("Failed to send email");
         }
     }
 
     public static void main(String[] args) {
+
         Dotenv dotenv = Dotenv.load();
         String username = dotenv.get("EMAIL_USERNAME");
         String password = dotenv.get("EMAIL_PASSWORD");
 
         EmailService emailService = new EmailService(username, password);
-
-        emailService.sendEmail("recipient@example.com", "Test Email", "Hello! This is a test email from Java.");
+        emailService.sendEmail(
+                "recipient@example.com",
+                "Test Email",
+                "Hello! This is a test email from Java."
+        );
     }
 }
