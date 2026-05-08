@@ -7,7 +7,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
-
 /**
  * The BookingService class is responsible for managing all booking operations
  * within the scheduling system.
@@ -33,13 +32,10 @@ public class BookingService {
     private final NotificationService notificationService;
     private final List<AppointmentObserver> observers = new ArrayList<>();
 
+    private List<AppointmentSlot> appointments;
+
     /**
      * Constructs a BookingService with the required NotificationService.
-     *
-     * <p>Initializes default booking rules and registers a notification observer
-     * to handle booking-related events.</p>
-     *
-     * @param notificationService the service used to send notifications
      */
     public BookingService(NotificationService notificationService) {
         this.notificationService = notificationService;
@@ -50,45 +46,20 @@ public class BookingService {
         this.addObserver(new NotificationObserver(notificationService));
     }
 
-    private List<AppointmentSlot> appointments;
-
-    /**
-     * Sets mock appointment data for testing purposes.
-     *
-     * <p>This method is mainly used in testing environments to inject
-     * predefined appointment slots instead of reading from files.</p>
-     *
-     * @param mockAppointments the list of appointment slots to be used as test data
-     */
     public void setMockAppointments(List<AppointmentSlot> mockAppointments) {
         this.appointments = mockAppointments;
     }
 
-    /**
-     * Adds a new observer to receive booking events.
-     *
-     * @param observer the observer to be registered
-     */
     public void addObserver(AppointmentObserver observer) {
         observers.add(observer);
     }
 
-    /**
-     * Notifies all registered observers that a booking has been confirmed.
-     *
-     * @param booking the booking that was successfully confirmed
-     */
     private void notifyConfirmed(Booking booking) {
         for (AppointmentObserver o : observers) {
             o.onBookingConfirmed(booking);
         }
     }
 
-    /**
-     * Notifies all registered observers that a booking has been cancelled.
-     *
-     * @param booking the booking that was cancelled
-     */
     private void notifyCancelled(Booking booking) {
         for (AppointmentObserver o : observers) {
             o.onBookingCancelled(booking);
@@ -98,33 +69,35 @@ public class BookingService {
     private boolean isValidEmail(String email) {
         if (email == null) return false;
 
-        
         if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
             return false;
         }
 
-        
         return email.endsWith("@gmail.com") ||
                email.endsWith("@yahoo.com") ||
                email.endsWith("@hotmail.com");
     }
 
-    /**
-     * Attempts to create a new booking for an appointment slot.
-     *
-     * <p>The method performs multiple steps:</p>
-     * <ul>
-     *   <li>Validates the booking using all defined rules.</li>
-     *   <li>Checks appointment availability.</li>
-     *   <li>Updates slot status and participant count.</li>
-     *   <li>Persists booking data to files.</li>
-     *   <li>Notifies observers upon successful booking.</li>
-     * </ul>
-     *
-     * @param booking the booking request containing user and appointment details
-     * @return a success message or failure reason
-     */
+    // =========================================================
+    // MAIN METHOD (REFRACTORED - complexity reduced)
+    // =========================================================
     public String bookAppointment(Booking booking) {
+
+        String validation = validateBooking(booking);
+        if (validation != null) return validation;
+
+        handleTypeLogic(booking);
+
+        List<String> slots = loadSlots();
+
+        return processSlots(booking, slots);
+    }
+
+    // =========================================================
+    // EXTRACTED METHODS
+    // =========================================================
+
+    private String validateBooking(Booking booking) {
 
         if (!isValidEmail(booking.getUsername())) {
             return "Booking Failed: Invalid Email Format";
@@ -132,42 +105,46 @@ public class BookingService {
 
         for (BookingRuleStrategy rule : rules) {
             String error = rule.validate(booking);
-            if (error != null)
-                return error;
+            if (error != null) return error;
         }
 
-        AppointmentType type = booking.getType();
+        return null;
+    }
 
-        if (type == AppointmentType.URGENT) {
+    private void handleTypeLogic(Booking booking) {
+
+        if (booking.getType() == AppointmentType.URGENT) {
             System.out.println("URGENT rules applied");
             System.out.println("Applying URGENT rules");
-        } else if (type == AppointmentType.GROUP) {
+        } else if (booking.getType() == AppointmentType.GROUP) {
             System.out.println("GROUP rules applied");
         }
+    }
 
-        List<String> slots;
+    private List<String> loadSlots() {
 
         if (appointments != null) {
 
-            slots = new ArrayList<>();
+            List<String> slots = new ArrayList<>();
 
             for (AppointmentSlot slot : appointments) {
 
-            	String status = slot.getAvailable() ? AVAILABLE : UNAVAILABLE;
-                slots.add(
-                        slot.getDate() + "," +
+                String status = slot.getAvailable() ? AVAILABLE : UNAVAILABLE;
+
+                slots.add(slot.getDate() + "," +
                         slot.getTime() + "," +
-                        status + ",60,0,5"
-                );
+                        status + ",60,0,5");
             }
 
-        } else {
+            return slots;
+        }
 
-            slots = fileService.readFile("src/main/resources/appointments.txt");
+        return fileService.readFile("src/main/resources/appointments.txt");
+    }
 
-        }      
+    private String processSlots(Booking booking, List<String> slots) {
+
         List<String> updated = new ArrayList<>();
-
         boolean booked = false;
 
         for (String slot : slots) {
@@ -186,9 +163,7 @@ public class BookingService {
             int current = Integer.parseInt(parts[4].trim());
             int max = Integer.parseInt(parts[5].trim());
 
-            if (date.equals(booking.getDate())
-                    && time.equals(booking.getTime())
-                    && status.equals(AVAILABLE)) {
+            if (isMatchingSlot(date, time, booking, status)) {
 
                 if (booking.getDuration() > duration) {
                     return "Booking Failed: Duration Exceeded";
@@ -201,7 +176,7 @@ public class BookingService {
                 current += booking.getParticipants();
 
                 if (current == max) {
-                	status = UNAVAILABLE;
+                    status = UNAVAILABLE;
                 }
 
                 updated.add(date + "," + time + "," + status + "," + duration + "," + current + "," + max);
@@ -212,7 +187,6 @@ public class BookingService {
                 try {
                     notifyConfirmed(booking);
                 } catch (Exception e) {
-                    System.out.println("DEBUG: Caught notification error: " + e.getMessage());
                     return "Booking Failed: Notification Error (" + e.getMessage() + ")";
                 }
 
@@ -238,20 +212,17 @@ public class BookingService {
         return "Booking Success";
     }
 
+    private boolean isMatchingSlot(String date, String time, Booking booking, String status) {
+        return date.equals(booking.getDate())
+                && time.equals(booking.getTime())
+                && status.equals(AVAILABLE);
+    }
+
     /**
      * Cancels an existing booking and updates the system state.
-     *
-     * <p>This includes:</p>
-     * <ul>
-     *   <li>Releasing reserved slots</li>
-     *   <li>Updating appointment availability</li>
-     *   <li>Removing booking from storage</li>
-     *   <li>Notifying observers about cancellation</li>
-     * </ul>
-     *
-     * @param booking the booking to be cancelled
      */
     public void cancelBooking(Booking booking) {
+
         booking.cancelBooking();
         notifyCancelled(booking);
 
@@ -282,6 +253,7 @@ public class BookingService {
                 status = AVAILABLE;
 
                 updated.add(date + "," + time + "," + status + "," + duration + "," + current + "," + max);
+
             } else {
                 updated.add(slot);
             }
@@ -304,18 +276,7 @@ public class BookingService {
     }
 
     /**
-     * Modifies an existing booking by replacing it with a new one.
-     *
-     * <p>This method prevents modification of past appointments by comparing
-     * the booking time with the current system time.</p>
-     *
-     * <p>If valid, the old booking is cancelled and a new booking is created.</p>
-     *
-     * @param oldBooking the existing booking
-     * @param newDate the updated date
-     * @param newTime the updated time
-     * @param currentDateTime the current system date and time
-     * @return a success or failure message
+     * Modifies an existing booking.
      */
     public String modifyBooking(Booking oldBooking, String newDate, String newTime,
                                 LocalDateTime currentDateTime) {
@@ -342,14 +303,6 @@ public class BookingService {
         return bookAppointment(newBooking);
     }
 
-    /**
-     * Modifies an existing booking using the current system time.
-     *
-     * @param oldBooking the existing booking
-     * @param newDate the updated date
-     * @param newTime the updated time
-     * @return a success or failure message
-     */
     public String modifyBooking(Booking oldBooking, String newDate, String newTime) {
         return modifyBooking(oldBooking, newDate, newTime, LocalDateTime.now());
     }
