@@ -38,9 +38,8 @@ class AdminServicesTest {
 	@BeforeEach
 	void setUp() throws Exception {
 		
-		appointmentsBackup = Files.readString(appointmentsPath);
-	    bookingsBackup = Files.readString(bookingsPath);
-		
+		appointmentsBackup = Files.exists(appointmentsPath) ? Files.readString(appointmentsPath) : "";
+		bookingsBackup = Files.exists(bookingsPath) ? Files.readString(bookingsPath) : "";		
 	}
 
 	@AfterEach
@@ -155,6 +154,7 @@ class AdminServicesTest {
 
 	    FileServices file = new FileServices();
 	    List<String> slots = file.readFile("src/main/resources/appointments.txt");
+	    slots.removeIf(s -> s == null || s.trim().isEmpty());
 
 	    boolean found = slots.stream().anyMatch(s -> s.equals("2026-05-01," + time + ",Available,30,0,5"));
 	    assertTrue(found);
@@ -173,7 +173,8 @@ class AdminServicesTest {
 	    FileServices file = new FileServices();
 	    List<String> slotsBefore = file.readFile("src/main/resources/appointments.txt");
 	    assertTrue(slotsBefore.stream()
-	        .anyMatch(s -> s.trim().equals("2026-05-01," + time + ",Available,30,0,5")));
+	    	    .map(String::trim)
+	    	    .anyMatch(s -> s.equals("2026-05-01," + time + ",Available,30,0,5")));
 
 	    admin.removeSlots("2026-05-01", time);
 	    List<String> slotsAfter = file.readFile("src/main/resources/appointments.txt");
@@ -193,6 +194,7 @@ class AdminServicesTest {
 
 	    FileServices file = new FileServices();
 	    List<String> slots = file.readFile("src/main/resources/appointments.txt");
+	    slots.removeIf(s -> s == null || s.trim().isEmpty());
 	    assertTrue(slots.stream()
 	        .anyMatch(s -> s.trim().startsWith("2026-05-01," + time + ",Unavailable")));
 	    assertFalse(slots.stream()
@@ -410,7 +412,13 @@ class AdminServicesTest {
         assertEquals("canceled", booking.getStatus());
     }
 	
-		
+    @Test
+    void testLoginPartialMatchWrongPasswordBranch() {
+        AdminServices admin = new AdminServices("admin", "1234", "admin@email.com", 6);
+        String result = admin.login("admin", "wrong");
+        assertEquals("Failed", result);
+        assertFalse(admin.isLoggedIn());
+    }
 
 }
 
