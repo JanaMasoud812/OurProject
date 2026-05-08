@@ -27,7 +27,11 @@ public class MainMenu {
     }
 
     public static void main(String[] args) {
-        while (true) {
+
+        boolean running = true;
+
+        while (running) {
+
             System.out.println("\n=== Scheduling System Main Menu ===");
             System.out.println("1. Login as Admin");
             System.out.println("2. Continue as User");
@@ -35,16 +39,22 @@ public class MainMenu {
             System.out.print("Choice: ");
 
             String choice = scanner.nextLine();
+
             switch (choice) {
+
                 case "1":
                     adminFlow();
                     break;
+
                 case "2":
                     userFlow();
                     break;
+
                 case "3":
                     System.out.println("Exiting...");
-                    System.exit(0);
+                    running = false;
+                    break;
+
                 default:
                     System.out.println("Invalid choice. Try again.");
             }
