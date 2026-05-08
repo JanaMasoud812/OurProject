@@ -4,6 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RuleFactory {
+	
+	 // Prevent instantiation
+    private RuleFactory() {
+        
+    }
 
     public static List<BookingRuleStrategy> getRules(AppointmentType type) {
         List<BookingRuleStrategy> rules = new ArrayList<>();
