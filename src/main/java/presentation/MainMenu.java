@@ -15,7 +15,7 @@ public class MainMenu {
     private static Dotenv dotenv = Dotenv.load();
     private static String emailUsername = dotenv.get("EMAIL_USERNAME");
     private static String emailPassword = dotenv.get("EMAIL_PASSWORD");
-    
+    private static final String CHOICE = "Choice: ";
     private static EmailService emailService = new EmailService(emailUsername, emailPassword);
     private static AdminServices adminService = new AdminServices("", "", "", 0);
     private static BookingService bookingService = new BookingService(emailService);
@@ -36,8 +36,7 @@ public class MainMenu {
             System.out.println("1. Login as Admin");
             System.out.println("2. Continue as User");
             System.out.println("3. Exit");
-            System.out.print("Choice: ");
-
+            System.out.print(CHOICE);
             String choice = scanner.nextLine();
 
             switch (choice) {
@@ -76,8 +75,7 @@ public class MainMenu {
                 System.out.println("3. Remove Slot");
                 System.out.println("4. Add Slot");
                 System.out.println("5. Logout");
-                System.out.print("Choice: ");
-
+                System.out.print(CHOICE);
                 String choice = scanner.nextLine();
                 switch (choice) {
                     case "1":
@@ -130,8 +128,7 @@ public class MainMenu {
             System.out.println("3. Modify Appointment");
             System.out.println("4. Cancel Appointment");
             System.out.println("5. Back to Main Menu");
-            System.out.print("Choice: ");
-
+            System.out.print(CHOICE);
             String choice = scanner.nextLine();
             switch (choice) {
                 case "1":
