@@ -28,6 +28,8 @@ public class BookingService {
 
     private FileServices fileService = new FileServices();
     private final List<BookingRuleStrategy> rules;
+    private static final String AVAILABLE = "Available";
+    private static final String UNAVAILABLE = "Unavailable";
     private final NotificationService notificationService;
     private final List<AppointmentObserver> observers = new ArrayList<>();
 
@@ -151,8 +153,7 @@ public class BookingService {
 
             for (AppointmentSlot slot : appointments) {
 
-                String status = slot.getAvailable() ? "Available" : "Unavailable";
-
+            	String status = slot.getAvailable() ? AVAILABLE : UNAVAILABLE;
                 slots.add(
                         slot.getDate() + "," +
                         slot.getTime() + "," +
@@ -187,7 +188,7 @@ public class BookingService {
 
             if (date.equals(booking.getDate())
                     && time.equals(booking.getTime())
-                    && status.equals("Available")) {
+                    && status.equals(AVAILABLE)) {
 
                 if (booking.getDuration() > duration) {
                     return "Booking Failed: Duration Exceeded";
@@ -200,7 +201,7 @@ public class BookingService {
                 current += booking.getParticipants();
 
                 if (current == max) {
-                    status = "Unavailable";
+                	status = UNAVAILABLE;
                 }
 
                 updated.add(date + "," + time + "," + status + "," + duration + "," + current + "," + max);
@@ -278,7 +279,7 @@ public class BookingService {
                 current -= booking.getParticipants();
                 if (current < 0) current = 0;
 
-                status = "Available";
+                status = AVAILABLE;
 
                 updated.add(date + "," + time + "," + status + "," + duration + "," + current + "," + max);
             } else {
