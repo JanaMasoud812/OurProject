@@ -10,8 +10,7 @@ import java.util.logging.Logger;
 public class AppointmentSlotServices extends AppointmentSlot{
 	
 	
-	private static final Logger LOGGER =
-	        Logger.getLogger(AppointmentSlotServices.class.getName());
+
 	
 	
 	public AppointmentSlotServices(String date, String time, boolean isAvailable) {
@@ -44,7 +43,8 @@ public class AppointmentSlotServices extends AppointmentSlot{
 	public String getTime() {
 		return  time;
 	}
-
+	private static final Logger LOGGER =
+	        Logger.getLogger(AppointmentSlotServices.class.getName());
 	@Override
 	public List<AppointmentSlot> viewAvailableSlots(List<AppointmentSlot> slots) {
 		 List<AppointmentSlot> availableSlots = new ArrayList<>();
