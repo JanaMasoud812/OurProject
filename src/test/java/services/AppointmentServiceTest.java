@@ -105,9 +105,11 @@ class AppointmentServiceTest {
                     }
                 };
 
-        assertThrows(RuntimeException.class, () -> {
-            service.viewAvailableSlots(new ArrayList<>());
-        });
+                List<AppointmentSlot> slots = new ArrayList<>();
+
+                assertThrows(RuntimeException.class, () -> {
+                    service.viewAvailableSlots(slots);
+                });
     }
 
 	
