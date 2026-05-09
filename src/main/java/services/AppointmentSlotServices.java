@@ -6,9 +6,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.logging.Logger;
 public class AppointmentSlotServices extends AppointmentSlot{
-
+	
+	
+	private static final Logger LOGGER =
+	        Logger.getLogger(AppointmentSlotServices.class.getName());
+	
+	
 	public AppointmentSlotServices(String date, String time, boolean isAvailable) {
 		super(date, time, isAvailable);
 	}
@@ -45,13 +50,11 @@ public class AppointmentSlotServices extends AppointmentSlot{
 		 List<AppointmentSlot> availableSlots = new ArrayList<>();
 
 		    try {
-		        // قراءة الملف من resources
 		        InputStream inputStream = getClass().getClassLoader()
 		                .getResourceAsStream("appointments.txt"); 
 		        
 		        if (inputStream == null) {
-		            System.out.println("appointments.txt not found");
-		            return availableSlots;
+		        	LOGGER.warning("appointments.txt not found");		            return availableSlots;
 		        }
 
 		        
@@ -78,8 +81,7 @@ public class AppointmentSlotServices extends AppointmentSlot{
 		        reader.close();
 
 		    } catch (Exception e) {
-		        System.out.println("Error reading appointments file: " + e.getMessage());
-		    }
+		    	LOGGER.severe("Error reading appointments file: " + e.getMessage());		    }
 
 		    return availableSlots;
 	}

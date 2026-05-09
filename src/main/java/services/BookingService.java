@@ -142,6 +142,37 @@ public class BookingService {
                 && time.equals(booking.getTime())
                 && status.equals(AVAILABLE);
     }
+    
+    private boolean isHeader(String slot) {
+        return slot.startsWith("Time") || slot.startsWith("Date");
+    }
+    
+    private String validateSlotRules(Booking booking,
+            int duration,
+            int current,
+            int max) {
+
+if (booking.getDuration() > duration) {
+return "Booking Failed: Duration Exceeded";
+}
+
+if (current + booking.getParticipants() > max) {
+return "Booking Failed: Max participants exceeded";
+}
+
+return null;
+}
+    
+    private String notifyBooking(Booking booking) {
+
+        try {
+            notifyConfirmed(booking);
+            return null;
+
+        } catch (Exception e) {
+            return "Booking Failed: Notification Error (" + e.getMessage() + ")";
+        }
+    }
 
     private String processSlots(Booking booking, List<String> slots) {
 
@@ -150,7 +181,7 @@ public class BookingService {
 
         for (String slot : slots) {
 
-            if (slot.startsWith("Time") || slot.startsWith("Date")) {
+            if (isHeader(slot)) {
                 updated.add(slot);
                 continue;
             }
@@ -160,18 +191,18 @@ public class BookingService {
             String date = parts[0].trim();
             String time = parts[1].trim();
             String status = parts[2].trim();
+
             int duration = Integer.parseInt(parts[3].trim());
             int current = Integer.parseInt(parts[4].trim());
             int max = Integer.parseInt(parts[5].trim());
 
             if (isMatchingSlot(date, time, booking, status)) {
 
-                if (booking.getDuration() > duration) {
-                    return "Booking Failed: Duration Exceeded";
-                }
+                String validation =
+                        validateSlotRules(booking, duration, current, max);
 
-                if (current + booking.getParticipants() > max) {
-                    return "Booking Failed: Max participants exceeded";
+                if (validation != null) {
+                    return validation;
                 }
 
                 current += booking.getParticipants();
@@ -180,15 +211,16 @@ public class BookingService {
                     status = UNAVAILABLE;
                 }
 
-                updated.add(date + "," + time + "," + status + "," + duration + "," + current + "," + max);
+                updated.add(date + "," + time + "," + status + "," +
+                        duration + "," + current + "," + max);
 
                 booking.confirmBooking();
                 booked = true;
 
-                try {
-                    notifyConfirmed(booking);
-                } catch (Exception e) {
-                    return "Booking Failed: Notification Error (" + e.getMessage() + ")";
+                String notificationError = notifyBooking(booking);
+
+                if (notificationError != null) {
+                    return notificationError;
                 }
 
             } else {
@@ -212,7 +244,6 @@ public class BookingService {
 
         return "Booking Success";
     }
-
     /** * Cancels an existing booking and updates the system state. * * <p>This includes:</p> * <ul> * <li>Releasing reserved slots</li> * <li>Updating appointment availability</li> * <li>Removing booking from storage</li> * <li>Notifying observers about cancellation</li> * </ul> * * @param booking the booking to be cancelled */
 
     public void cancelBooking(Booking booking) {
